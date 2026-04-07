@@ -5,17 +5,13 @@
 # compile C with /usr/bin/cc
 ASM_DEFINES = -DDEBUG -DSTM32L4R5xx -DUSE_HAL_DRIVER
 
-ASM_INCLUDES = -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/tft_display -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Core/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+ASM_INCLUDES = -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Core/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/tft_display
 
-ASM_FLAGSarm64 = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-
-ASM_FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+ASM_FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 
 C_DEFINES = -DDEBUG -DSTM32L4R5xx -DUSE_HAL_DRIVER
 
-C_INCLUDES = -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/tft_display -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Core/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Include
+C_INCLUDES = -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Core/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/tft_display
 
-C_FLAGSarm64 = -g -std=gnu11 -arch arm64
-
-C_FLAGS = -g -std=gnu11 -arch arm64
+C_FLAGS = -g -std=gnu11
 

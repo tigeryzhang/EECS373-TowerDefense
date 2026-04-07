@@ -21,13 +21,13 @@ set(CMAKE_TARGET_DEFINITIONS_ASM
 
 # The include file search paths:
 set(CMAKE_ASM_TARGET_INCLUDE_PATH
-  "libs/pvz/include"
-  "libs/tft_display"
   "cmake/stm32cubemx/../../Core/Inc"
   "cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc"
   "cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy"
   "cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include"
   "cmake/stm32cubemx/../../Drivers/CMSIS/Include"
+  "libs/pvz/include"
+  "libs/tft_display"
   )
 
 # The set of dependency files which are needed:
@@ -37,16 +37,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/stm32l4xx_it.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_it.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_it.c.o.d"
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/syscalls.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o.d"
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/sysmem.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/sysmem.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/sysmem.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/app.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game_types.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/input.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/placeholder_scene.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/play_scene.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/presentation.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_config.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_utils.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o.d"
-  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/render_assets.c" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

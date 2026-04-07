@@ -6,7 +6,5 @@ C_DEFINES = -DDEBUG -DSTM32L4R5xx -DUSE_HAL_DRIVER
 
 C_INCLUDES = -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Core/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/../../Drivers/CMSIS/Include
 
-C_FLAGSarm64 = -g -std=gnu11 -arch arm64
-
-C_FLAGS = -g -std=gnu11 -arch arm64
+C_FLAGS = -g -std=gnu11
 

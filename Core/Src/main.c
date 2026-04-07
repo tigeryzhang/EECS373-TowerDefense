@@ -118,6 +118,28 @@ static bool hud_palette_rgb666_initialized = false;
 
 static int min_int(int a, int b) { return a < b ? a : b; }
 
+static uint32_t frame_timer_now_us(void) { return __HAL_TIM_GET_COUNTER(&htim2); }
+
+static uint32_t frame_timer_elapsed_us(uint32_t start_us, uint32_t end_us) { return end_us - start_us; }
+
+static uint32_t fixed_dt_to_frame_us(float fixed_dt) {
+	if (fixed_dt <= 0.0f) {
+		fixed_dt = PVZ_DEFAULT_FIXED_DT;
+	}
+
+	return (uint32_t)(fixed_dt * 1000000.0f + 0.5f);
+}
+
+static float frame_dt_from_elapsed_us(uint32_t elapsed_us, float fallback_dt) {
+	const float frame_dt = (float)elapsed_us / 1000000.0f;
+
+	if (frame_dt <= 0.0f || frame_dt > (fallback_dt * 4.0f)) {
+		return fallback_dt;
+	}
+
+	return frame_dt;
+}
+
 static void rgb565_to_rgb666_bytes(uint16_t color, uint8_t rgb[3]) {
 	rgb[0] = (uint8_t)(((color >> 11) & 0x1Fu) << 3);
 	rgb[1] = (uint8_t)(((color >> 5) & 0x3Fu) << 2);
@@ -258,16 +280,23 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	HAL_TIM_Base_Start(&htim2);
+	__HAL_TIM_SET_COUNTER(&htim2, 0);
+
+	uint32_t previous_frame_start_us = frame_timer_now_us() - fixed_dt_to_frame_us(app.config.fixed_dt);
 
 	volatile uint32_t work_duration_us;
 	while (1) {
-		uint32_t frame_start_us = TIM2->CNT;
+		const uint32_t target_frame_us = fixed_dt_to_frame_us(app.config.fixed_dt);
+		const uint32_t frame_start_us = frame_timer_now_us();
+		const float frame_dt =
+			frame_dt_from_elapsed_us(frame_timer_elapsed_us(previous_frame_start_us, frame_start_us), app.config.fixed_dt);
+		previous_frame_start_us = frame_start_us;
 
 		InputFrame input;
 		input_frame_reset(&input);
 
 		// Update and render
-		if (app_update(&app, &input, 1. / 5000.) == UPDATE_CHANGED_SCENE) {
+		if (app_update(&app, &input, frame_dt) == UPDATE_CHANGED_SCENE) {
 			app_prerender(&app, &view, &data);
 		}
 		app_render(&app, &view, &data);
@@ -279,34 +308,17 @@ int main(void) {
 
 		/* USER CODE BEGIN 3 */
 		// Measure actual work time (Profiling)
-		uint32_t work_end_us = TIM2->CNT;
+		const uint32_t work_end_us = frame_timer_now_us();
 
 		// Calculate how long your game logic actually took, accounting for overflow
-		if (work_end_us >= frame_start_us) {
-			work_duration_us = work_end_us - frame_start_us;
-		} else {
-			work_duration_us = (0xFFFFFFFF - frame_start_us) + work_end_us + 1;
+		work_duration_us = frame_timer_elapsed_us(frame_start_us, work_end_us);
+		// NOTE: 'work_duration_us' is the active CPU time.
+		// If this number is frequently larger than target_frame_us, the code
+		// is too slow to maintain the requested frame rate.
+
+		while (frame_timer_elapsed_us(frame_start_us, frame_timer_now_us()) < target_frame_us) {
+			__NOP();
 		}
-
-		// NOTE: 'work_duration_us' is your active CPU time.
-		// If this number is frequently larger than TARGET_FRAMETIME_US, your code
-		// is too slow to maintain 60 FPS, and your game will lag!
-
-		// Limit fps
-		//		while (1) {
-		//			uint32_t current_time_us = TIM2->CNT;
-		//			uint32_t elapsed_us;
-		//
-		//			if (current_time_us >= frame_start_us) {
-		//				elapsed_us = current_time_us - frame_start_us;
-		//			} else {
-		//				elapsed_us = (0xFFFFFFFF - frame_start_us) + current_time_us
-		//						+ 1;
-		//			}
-		//
-		//			if (elapsed_us >= TARGET_FRAMETIME_US) {
-		//				break;
-		//			}
 	}
 	/* USER CODE END 3 */
 }

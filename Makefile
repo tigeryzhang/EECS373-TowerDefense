@@ -130,6 +130,32 @@ pvz-with-hud/fast:
 .PHONY : pvz-with-hud/fast
 
 #=============================================================================
+# Target rules for targets named pvz
+
+# Build rule for target.
+pvz: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pvz
+.PHONY : pvz
+
+# fast build rule for target.
+pvz/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/build
+.PHONY : pvz/fast
+
+#=============================================================================
+# Target rules for targets named tft_display
+
+# Build rule for target.
+tft_display: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tft_display
+.PHONY : tft_display
+
+# fast build rule for target.
+tft_display/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tft_display.dir/build.make CMakeFiles/tft_display.dir/build
+.PHONY : tft_display/fast
+
+#=============================================================================
 # Target rules for targets named STM32_Drivers
 
 # Build rule for target.
@@ -267,7 +293,7 @@ libs/pvz/src/app.o: libs/pvz/src/app.c.o
 
 # target to build an object file
 libs/pvz/src/app.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/app.c.o
 .PHONY : libs/pvz/src/app.c.o
 
 libs/pvz/src/app.i: libs/pvz/src/app.c.i
@@ -275,7 +301,7 @@ libs/pvz/src/app.i: libs/pvz/src/app.c.i
 
 # target to preprocess a source file
 libs/pvz/src/app.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/app.c.i
 .PHONY : libs/pvz/src/app.c.i
 
 libs/pvz/src/app.s: libs/pvz/src/app.c.s
@@ -283,7 +309,7 @@ libs/pvz/src/app.s: libs/pvz/src/app.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/app.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/app.c.s
 .PHONY : libs/pvz/src/app.c.s
 
 libs/pvz/src/game.o: libs/pvz/src/game.c.o
@@ -291,7 +317,7 @@ libs/pvz/src/game.o: libs/pvz/src/game.c.o
 
 # target to build an object file
 libs/pvz/src/game.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game.c.o
 .PHONY : libs/pvz/src/game.c.o
 
 libs/pvz/src/game.i: libs/pvz/src/game.c.i
@@ -299,7 +325,7 @@ libs/pvz/src/game.i: libs/pvz/src/game.c.i
 
 # target to preprocess a source file
 libs/pvz/src/game.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game.c.i
 .PHONY : libs/pvz/src/game.c.i
 
 libs/pvz/src/game.s: libs/pvz/src/game.c.s
@@ -307,7 +333,7 @@ libs/pvz/src/game.s: libs/pvz/src/game.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/game.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game.c.s
 .PHONY : libs/pvz/src/game.c.s
 
 libs/pvz/src/game_types.o: libs/pvz/src/game_types.c.o
@@ -315,7 +341,7 @@ libs/pvz/src/game_types.o: libs/pvz/src/game_types.c.o
 
 # target to build an object file
 libs/pvz/src/game_types.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game_types.c.o
 .PHONY : libs/pvz/src/game_types.c.o
 
 libs/pvz/src/game_types.i: libs/pvz/src/game_types.c.i
@@ -323,7 +349,7 @@ libs/pvz/src/game_types.i: libs/pvz/src/game_types.c.i
 
 # target to preprocess a source file
 libs/pvz/src/game_types.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game_types.c.i
 .PHONY : libs/pvz/src/game_types.c.i
 
 libs/pvz/src/game_types.s: libs/pvz/src/game_types.c.s
@@ -331,7 +357,7 @@ libs/pvz/src/game_types.s: libs/pvz/src/game_types.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/game_types.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/game_types.c.s
 .PHONY : libs/pvz/src/game_types.c.s
 
 libs/pvz/src/input.o: libs/pvz/src/input.c.o
@@ -339,7 +365,7 @@ libs/pvz/src/input.o: libs/pvz/src/input.c.o
 
 # target to build an object file
 libs/pvz/src/input.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/input.c.o
 .PHONY : libs/pvz/src/input.c.o
 
 libs/pvz/src/input.i: libs/pvz/src/input.c.i
@@ -347,7 +373,7 @@ libs/pvz/src/input.i: libs/pvz/src/input.c.i
 
 # target to preprocess a source file
 libs/pvz/src/input.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/input.c.i
 .PHONY : libs/pvz/src/input.c.i
 
 libs/pvz/src/input.s: libs/pvz/src/input.c.s
@@ -355,7 +381,7 @@ libs/pvz/src/input.s: libs/pvz/src/input.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/input.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/input.c.s
 .PHONY : libs/pvz/src/input.c.s
 
 libs/pvz/src/placeholder_scene.o: libs/pvz/src/placeholder_scene.c.o
@@ -363,7 +389,7 @@ libs/pvz/src/placeholder_scene.o: libs/pvz/src/placeholder_scene.c.o
 
 # target to build an object file
 libs/pvz/src/placeholder_scene.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/placeholder_scene.c.o
 .PHONY : libs/pvz/src/placeholder_scene.c.o
 
 libs/pvz/src/placeholder_scene.i: libs/pvz/src/placeholder_scene.c.i
@@ -371,7 +397,7 @@ libs/pvz/src/placeholder_scene.i: libs/pvz/src/placeholder_scene.c.i
 
 # target to preprocess a source file
 libs/pvz/src/placeholder_scene.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/placeholder_scene.c.i
 .PHONY : libs/pvz/src/placeholder_scene.c.i
 
 libs/pvz/src/placeholder_scene.s: libs/pvz/src/placeholder_scene.c.s
@@ -379,7 +405,7 @@ libs/pvz/src/placeholder_scene.s: libs/pvz/src/placeholder_scene.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/placeholder_scene.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/placeholder_scene.c.s
 .PHONY : libs/pvz/src/placeholder_scene.c.s
 
 libs/pvz/src/play_scene.o: libs/pvz/src/play_scene.c.o
@@ -387,7 +413,7 @@ libs/pvz/src/play_scene.o: libs/pvz/src/play_scene.c.o
 
 # target to build an object file
 libs/pvz/src/play_scene.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/play_scene.c.o
 .PHONY : libs/pvz/src/play_scene.c.o
 
 libs/pvz/src/play_scene.i: libs/pvz/src/play_scene.c.i
@@ -395,7 +421,7 @@ libs/pvz/src/play_scene.i: libs/pvz/src/play_scene.c.i
 
 # target to preprocess a source file
 libs/pvz/src/play_scene.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/play_scene.c.i
 .PHONY : libs/pvz/src/play_scene.c.i
 
 libs/pvz/src/play_scene.s: libs/pvz/src/play_scene.c.s
@@ -403,7 +429,7 @@ libs/pvz/src/play_scene.s: libs/pvz/src/play_scene.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/play_scene.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/play_scene.c.s
 .PHONY : libs/pvz/src/play_scene.c.s
 
 libs/pvz/src/presentation.o: libs/pvz/src/presentation.c.o
@@ -411,7 +437,7 @@ libs/pvz/src/presentation.o: libs/pvz/src/presentation.c.o
 
 # target to build an object file
 libs/pvz/src/presentation.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/presentation.c.o
 .PHONY : libs/pvz/src/presentation.c.o
 
 libs/pvz/src/presentation.i: libs/pvz/src/presentation.c.i
@@ -419,7 +445,7 @@ libs/pvz/src/presentation.i: libs/pvz/src/presentation.c.i
 
 # target to preprocess a source file
 libs/pvz/src/presentation.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/presentation.c.i
 .PHONY : libs/pvz/src/presentation.c.i
 
 libs/pvz/src/presentation.s: libs/pvz/src/presentation.c.s
@@ -427,7 +453,7 @@ libs/pvz/src/presentation.s: libs/pvz/src/presentation.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/presentation.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/presentation.c.s
 .PHONY : libs/pvz/src/presentation.c.s
 
 libs/pvz/src/pvz_config.o: libs/pvz/src/pvz_config.c.o
@@ -435,7 +461,7 @@ libs/pvz/src/pvz_config.o: libs/pvz/src/pvz_config.c.o
 
 # target to build an object file
 libs/pvz/src/pvz_config.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_config.c.o
 .PHONY : libs/pvz/src/pvz_config.c.o
 
 libs/pvz/src/pvz_config.i: libs/pvz/src/pvz_config.c.i
@@ -443,7 +469,7 @@ libs/pvz/src/pvz_config.i: libs/pvz/src/pvz_config.c.i
 
 # target to preprocess a source file
 libs/pvz/src/pvz_config.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_config.c.i
 .PHONY : libs/pvz/src/pvz_config.c.i
 
 libs/pvz/src/pvz_config.s: libs/pvz/src/pvz_config.c.s
@@ -451,15 +477,39 @@ libs/pvz/src/pvz_config.s: libs/pvz/src/pvz_config.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/pvz_config.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_config.c.s
 .PHONY : libs/pvz/src/pvz_config.c.s
+
+libs/pvz/src/pvz_rect.o: libs/pvz/src/pvz_rect.c.o
+.PHONY : libs/pvz/src/pvz_rect.o
+
+# target to build an object file
+libs/pvz/src/pvz_rect.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_rect.c.o
+.PHONY : libs/pvz/src/pvz_rect.c.o
+
+libs/pvz/src/pvz_rect.i: libs/pvz/src/pvz_rect.c.i
+.PHONY : libs/pvz/src/pvz_rect.i
+
+# target to preprocess a source file
+libs/pvz/src/pvz_rect.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_rect.c.i
+.PHONY : libs/pvz/src/pvz_rect.c.i
+
+libs/pvz/src/pvz_rect.s: libs/pvz/src/pvz_rect.c.s
+.PHONY : libs/pvz/src/pvz_rect.s
+
+# target to generate assembly for a file
+libs/pvz/src/pvz_rect.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_rect.c.s
+.PHONY : libs/pvz/src/pvz_rect.c.s
 
 libs/pvz/src/pvz_utils.o: libs/pvz/src/pvz_utils.c.o
 .PHONY : libs/pvz/src/pvz_utils.o
 
 # target to build an object file
 libs/pvz/src/pvz_utils.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_utils.c.o
 .PHONY : libs/pvz/src/pvz_utils.c.o
 
 libs/pvz/src/pvz_utils.i: libs/pvz/src/pvz_utils.c.i
@@ -467,7 +517,7 @@ libs/pvz/src/pvz_utils.i: libs/pvz/src/pvz_utils.c.i
 
 # target to preprocess a source file
 libs/pvz/src/pvz_utils.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_utils.c.i
 .PHONY : libs/pvz/src/pvz_utils.c.i
 
 libs/pvz/src/pvz_utils.s: libs/pvz/src/pvz_utils.c.s
@@ -475,7 +525,7 @@ libs/pvz/src/pvz_utils.s: libs/pvz/src/pvz_utils.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/pvz_utils.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/pvz_utils.c.s
 .PHONY : libs/pvz/src/pvz_utils.c.s
 
 libs/pvz/src/render_assets.o: libs/pvz/src/render_assets.c.o
@@ -483,7 +533,7 @@ libs/pvz/src/render_assets.o: libs/pvz/src/render_assets.c.o
 
 # target to build an object file
 libs/pvz/src/render_assets.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/render_assets.c.o
 .PHONY : libs/pvz/src/render_assets.c.o
 
 libs/pvz/src/render_assets.i: libs/pvz/src/render_assets.c.i
@@ -491,7 +541,7 @@ libs/pvz/src/render_assets.i: libs/pvz/src/render_assets.c.i
 
 # target to preprocess a source file
 libs/pvz/src/render_assets.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/render_assets.c.i
 .PHONY : libs/pvz/src/render_assets.c.i
 
 libs/pvz/src/render_assets.s: libs/pvz/src/render_assets.c.s
@@ -499,8 +549,32 @@ libs/pvz/src/render_assets.s: libs/pvz/src/render_assets.c.s
 
 # target to generate assembly for a file
 libs/pvz/src/render_assets.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz.dir/build.make CMakeFiles/pvz.dir/libs/pvz/src/render_assets.c.s
 .PHONY : libs/pvz/src/render_assets.c.s
+
+libs/tft_display/ili9488.o: libs/tft_display/ili9488.c.o
+.PHONY : libs/tft_display/ili9488.o
+
+# target to build an object file
+libs/tft_display/ili9488.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tft_display.dir/build.make CMakeFiles/tft_display.dir/libs/tft_display/ili9488.c.o
+.PHONY : libs/tft_display/ili9488.c.o
+
+libs/tft_display/ili9488.i: libs/tft_display/ili9488.c.i
+.PHONY : libs/tft_display/ili9488.i
+
+# target to preprocess a source file
+libs/tft_display/ili9488.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tft_display.dir/build.make CMakeFiles/tft_display.dir/libs/tft_display/ili9488.c.i
+.PHONY : libs/tft_display/ili9488.c.i
+
+libs/tft_display/ili9488.s: libs/tft_display/ili9488.c.s
+.PHONY : libs/tft_display/ili9488.s
+
+# target to generate assembly for a file
+libs/tft_display/ili9488.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tft_display.dir/build.make CMakeFiles/tft_display.dir/libs/tft_display/ili9488.c.s
+.PHONY : libs/tft_display/ili9488.c.s
 
 startup_stm32l4r5xx.o: startup_stm32l4r5xx.s.o
 .PHONY : startup_stm32l4r5xx.o
@@ -519,7 +593,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... STM32_Drivers"
+	@echo "... pvz"
 	@echo "... pvz-with-hud"
+	@echo "... tft_display"
 	@echo "... Core/Src/main.o"
 	@echo "... Core/Src/main.i"
 	@echo "... Core/Src/main.s"
@@ -559,12 +635,18 @@ help:
 	@echo "... libs/pvz/src/pvz_config.o"
 	@echo "... libs/pvz/src/pvz_config.i"
 	@echo "... libs/pvz/src/pvz_config.s"
+	@echo "... libs/pvz/src/pvz_rect.o"
+	@echo "... libs/pvz/src/pvz_rect.i"
+	@echo "... libs/pvz/src/pvz_rect.s"
 	@echo "... libs/pvz/src/pvz_utils.o"
 	@echo "... libs/pvz/src/pvz_utils.i"
 	@echo "... libs/pvz/src/pvz_utils.s"
 	@echo "... libs/pvz/src/render_assets.o"
 	@echo "... libs/pvz/src/render_assets.i"
 	@echo "... libs/pvz/src/render_assets.s"
+	@echo "... libs/tft_display/ili9488.o"
+	@echo "... libs/tft_display/ili9488.i"
+	@echo "... libs/tft_display/ili9488.s"
 	@echo "... startup_stm32l4r5xx.o"
 .PHONY : help
 

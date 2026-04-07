@@ -275,7 +275,7 @@ static const PvzLevelDef *current_level_def(const GameState *state) {
 static uint8_t current_wave_weight(const PvzWaveDef *wave) { return wave->weight > 0 ? wave->weight : 1; }
 
 static uint16_t seconds_to_runtime_ticks(const GameState *state, float seconds) {
-	const float fallback_dt = 1.0f / 30.0f;
+	const float fallback_dt = PVZ_DEFAULT_FIXED_DT;
 	const float fixed_dt =
 		(state && state->config && state->config->fixed_dt > 0.0f) ? state->config->fixed_dt : fallback_dt;
 

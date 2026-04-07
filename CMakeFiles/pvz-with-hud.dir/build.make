@@ -155,146 +155,6 @@ CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling ASM source to assembly CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.s"
 	/usr/bin/cc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/startup_stm32l4r5xx.s -o CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.s
 
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o: libs/pvz/src/app.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/app.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/app.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/app.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o: libs/pvz/src/game.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o: libs/pvz/src/game_types.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game_types.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game_types.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/game_types.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o: libs/pvz/src/input.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/input.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/input.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/input.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o: libs/pvz/src/placeholder_scene.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/placeholder_scene.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/placeholder_scene.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/placeholder_scene.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o: libs/pvz/src/play_scene.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/play_scene.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/play_scene.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/play_scene.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o: libs/pvz/src/presentation.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/presentation.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/presentation.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/presentation.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o: libs/pvz/src/pvz_config.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_config.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_config.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_config.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o: libs/pvz/src/pvz_utils.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_utils.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_utils.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/pvz_utils.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.s
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o: CMakeFiles/pvz-with-hud.dir/flags.make
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o: libs/pvz/src/render_assets.c
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o: CMakeFiles/pvz-with-hud.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o -MF CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o.d -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o -c /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/render_assets.c
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/render_assets.c > CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.i
-
-CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/libs/pvz/src/render_assets.c -o CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.s
-
 # Object files for target pvz-with-hud
 pvz__with__hud_OBJECTS = \
 "CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.o" \
@@ -302,17 +162,7 @@ pvz__with__hud_OBJECTS = \
 "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o" \
 "CMakeFiles/pvz-with-hud.dir/Core/Src/sysmem.c.o" \
 "CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o" \
-"CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o" \
-"CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o"
+"CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.o"
 
 # External object files for target pvz-with-hud
 pvz__with__hud_EXTERNAL_OBJECTS = \
@@ -352,16 +202,6 @@ pvz-with-hud: CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o
 pvz-with-hud: CMakeFiles/pvz-with-hud.dir/Core/Src/sysmem.c.o
 pvz-with-hud: CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o
 pvz-with-hud: CMakeFiles/pvz-with-hud.dir/startup_stm32l4r5xx.s.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/app.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/game_types.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/input.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/placeholder_scene.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/play_scene.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/presentation.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_config.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/pvz_utils.c.o
-pvz-with-hud: CMakeFiles/pvz-with-hud.dir/libs/pvz/src/render_assets.c.o
 pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32l4xx.c.o
 pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_adc.c.o
 pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_adc_ex.c.o
@@ -392,8 +232,10 @@ pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32
 pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim.c.o
 pvz-with-hud: cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_tim_ex.c.o
 pvz-with-hud: CMakeFiles/pvz-with-hud.dir/build.make
+pvz-with-hud: libpvz.a
+pvz-with-hud: libtft_display.a
 pvz-with-hud: CMakeFiles/pvz-with-hud.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking C executable pvz-with-hud"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking C executable pvz-with-hud"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/pvz-with-hud.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

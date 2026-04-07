@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtft_display.a CMakeFiles/tft_display.dir/libs/tft_display/ili9488.c.o
+/usr/bin/ranlib libtft_display.a
