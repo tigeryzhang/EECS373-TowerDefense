@@ -270,7 +270,7 @@ int main(void) {
 	MX_USB_OTG_FS_USB_Init();
 	/* USER CODE BEGIN 2 */
 	ILI9488_Init();
-	ILI9488_SetRotation(3);
+	ILI9488_SetRotation(1);
 
 	GameConfig config = pvz_make_default_config();
 
