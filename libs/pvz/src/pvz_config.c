@@ -6,8 +6,8 @@ GameConfig pvz_make_default_config(void) {
 		.rows = 4,
 		.cols = 7,
 		.tile_size = 16,
-		.board_x_resolution = 64,
-		.board_y_resolution = 32,
+		.board_x_resolution = 128,
+		.board_y_resolution = 64,
 		.hud_x_resolution = 480,
 		.hud_y_resolution = 320,
 		.starting_sun = 200,
@@ -59,7 +59,7 @@ void pvz_clamp_config(GameConfig *config) {
 	config->wallnut_seed_cooldown = clamp_int(config->wallnut_seed_cooldown, 0, 600);
 
 	if (config->fixed_dt <= 0.0f) {
-		config->fixed_dt = PVZ_DEFAULT_FIXED_DT;
+		config->fixed_dt = 1.0f / 30.0f;
 	}
 }
 

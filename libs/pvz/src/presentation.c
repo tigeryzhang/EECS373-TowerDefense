@@ -28,6 +28,7 @@ static const uint8_t letter_glyphs[26][5] = {
 // clang-format off
 static const PaletteRgb palette_rgb[] = {
 	[RENDER_PALETTE_BG] = {26, 43, 26},
+	[RENDER_PALETTE_BLACK] = {0, 0, 0},
 	[RENDER_PALETTE_PANEL] = {233, 223, 187},
 	[RENDER_PALETTE_TILE_LIGHT] = {149, 196, 82},
 	[RENDER_PALETTE_TILE_DARK] = {122, 168, 62},
@@ -701,7 +702,7 @@ static void draw_board_entities(RenderView *view, const GameState *game, const I
 
 static void draw_play_board_full(RenderView *view, const GameState *game, int plant_padding, int zombie_size,
 								 int projectile_size, int sun_size) {
-	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BG);
+	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
 	draw_tile_checkerboard(view, game, NULL);
 	draw_board_entities(view, game, NULL, plant_padding, zombie_size, projectile_size, sun_size);
 }
@@ -909,7 +910,7 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 void presentation_render_placeholder_view(RenderView *view, const GameConfig *config) {
 	(void)config;
 
-	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BG);
+	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
 	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_BG);
 
 	for (int y = 0; y < view->board_height; ++y) {
@@ -929,7 +930,7 @@ void presentation_render_placeholder_view(RenderView *view, const GameConfig *co
 	draw_rect(view, RENDER_TARGET_BOARD,
 			  pvz_rect_make(view->board_width / 4 + 4, view->board_height / 4 + 4, view->board_width / 2 - 8,
 							view->board_height / 2 - 8),
-			  RENDER_PALETTE_BG, 0);
+			  RENDER_PALETTE_BLACK, 0);
 
 	mark_full_target_dirty(view, RENDER_TARGET_BOARD);
 	mark_full_target_dirty(view, RENDER_TARGET_HUD);
