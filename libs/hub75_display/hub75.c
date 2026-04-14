@@ -7,6 +7,7 @@
 
 #define HUB75_BUFFER_COUNT 2u
 #define HUB75_HALF_HEIGHT (HUB75_HEIGHT / 2u)
+#define HUB75_COLOR_MAX ((1u << HUB75_COLOR_BITS) - 1u)
 #define HUB75_DATA_MASK (HUB75_R1_PIN | HUB75_G1_PIN | HUB75_B1_PIN | HUB75_R2_PIN | HUB75_G2_PIN | HUB75_B2_PIN)
 #define HUB75_ADDR_MASK (HUB75_A_PIN | HUB75_B_PIN | HUB75_C_PIN | HUB75_D_PIN)
 
@@ -51,12 +52,16 @@ static inline uint32_t addr_word_for_row(uint8_t row) {
 	return bsrr;
 }
 
-static inline uint8_t quantize_5bit_to_2bit(uint8_t value) {
-	return (uint8_t)(((uint16_t)value * 3u + 15u) / 31u);
+static inline uint8_t quantize_channel(uint8_t value, uint8_t input_max) {
+	return (uint8_t)(((uint32_t)value * HUB75_COLOR_MAX + (uint32_t)(input_max / 2u)) / (uint32_t)input_max);
 }
 
-static inline uint8_t quantize_6bit_to_2bit(uint8_t value) {
-	return (uint8_t)(((uint16_t)value * 3u + 31u) / 63u);
+static inline uint8_t quantize_5bit(uint8_t value) {
+	return quantize_channel(value, 31u);
+}
+
+static inline uint8_t quantize_6bit(uint8_t value) {
+	return quantize_channel(value, 63u);
 }
 
 static inline void set_output_blank(bool blank) {
@@ -197,7 +202,7 @@ void hub75_set_palette_rgb565(uint8_t index, uint16_t rgb565) {
 	const uint8_t green6 = (uint8_t)((rgb565 >> 5) & 0x3Fu);
 	const uint8_t blue5 = (uint8_t)(rgb565 & 0x1Fu);
 
-	set_palette_masks(index, quantize_5bit_to_2bit(red5), quantize_6bit_to_2bit(green6), quantize_5bit_to_2bit(blue5));
+	set_palette_masks(index, quantize_5bit(red5), quantize_6bit(green6), quantize_5bit(blue5));
 }
 
 void hub75_upload_indexed_64x32(const uint8_t *pixels, uint16_t stride) {
