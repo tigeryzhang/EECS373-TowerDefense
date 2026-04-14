@@ -354,7 +354,7 @@ static void draw_tile_checkerboard(RenderView *view, const GameState *game, cons
 		for (int col = 0; col < game->config->cols; ++col) {
 			const IntRect rect = board_cell_rect(game, row, col, 0);
 			const RenderPalette palette = ((row + col) % 2 == 0) ? RENDER_PALETTE_TILE_LIGHT : RENDER_PALETTE_TILE_DARK;
-			draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, palette, 0, clip);
+			draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, palette, 1, clip);
 		}
 	}
 }
