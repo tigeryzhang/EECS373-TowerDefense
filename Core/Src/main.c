@@ -280,14 +280,13 @@ int main(void) {
 					 config.hud_y_resolution);
 	render_data_init(&render_data);
 
+	app_prerender(&app, &render_view, &render_data);
+	upload_to_hud(&render_view);
+
 	hub75_init();
 	init_hub75_palette();
 	hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
 	hub75_start();
-
-	app_prerender(&app, &render_view, &render_data);
-	upload_to_hud(&render_view);
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
