@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "hub75.h"
 #include "input.h"
 #include "presentation.h"
 #include "pvz_config.h"
@@ -58,7 +59,6 @@ SMBUS_HandleTypeDef hsmbus2;
 
 UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart2;
-UART_HandleTypeDef huart3;
 
 SAI_HandleTypeDef hsai_BlockB1;
 SAI_HandleTypeDef hsai_BlockA1;
@@ -71,10 +71,19 @@ DMA_HandleTypeDef hdma_spi1_tx;
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
-TIM_HandleTypeDef htim4;
 TIM_HandleTypeDef htim15;
 
 /* USER CODE BEGIN PV */
+#if defined(__GNUC__)
+#define RAM3_BSS __attribute__((section(".ram3_bss")))
+#else
+#define RAM3_BSS
+#endif
+
+// Keep the large software framebuffers out of the main SRAM stack/BSS bank.
+static RAM3_BSS RenderView render_view;
+static AppContext app;
+static RenderData render_data;
 
 /* USER CODE END PV */
 
@@ -90,7 +99,6 @@ static void MX_I2C1_SMBUS_Init(void);
 static void MX_I2C2_SMBUS_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_USART3_UART_Init(void);
 static void MX_SAI1_Init(void);
 static void MX_SAI2_Init(void);
 static void MX_SPI1_Init(void);
@@ -98,7 +106,6 @@ static void MX_SPI3_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
-static void MX_TIM4_Init(void);
 static void MX_TIM15_Init(void);
 static void MX_USB_OTG_FS_USB_Init(void);
 /* USER CODE BEGIN PFP */
@@ -156,6 +163,12 @@ static void init_hud_palette_rgb666(void) {
 	}
 
 	hud_palette_rgb666_initialized = true;
+}
+
+static void init_hub75_palette(void) {
+	for (int palette = 0; palette < HUD_PALETTE_COUNT; ++palette) {
+		hub75_set_palette_rgb565((uint8_t)palette, presentation_palette_to_rgb565((RenderPalette)palette));
+	}
 }
 
 static void upload_to_hud(const RenderView *view) {
@@ -246,7 +259,6 @@ int main(void) {
 	MX_I2C2_SMBUS_Init();
 	MX_LPUART1_UART_Init();
 	MX_USART2_UART_Init();
-	MX_USART3_UART_Init();
 	MX_SAI1_Init();
 	MX_SAI2_Init();
 	MX_SPI1_Init();
@@ -254,7 +266,6 @@ int main(void) {
 	MX_TIM1_Init();
 	MX_TIM2_Init();
 	MX_TIM3_Init();
-	MX_TIM4_Init();
 	MX_TIM15_Init();
 	MX_USB_OTG_FS_USB_Init();
 	/* USER CODE BEGIN 2 */
@@ -263,17 +274,19 @@ int main(void) {
 
 	GameConfig config = pvz_make_default_config();
 
-	AppContext app;
 	app_init(&app, &config);
 
-	RenderView view;
-	RenderData data;
-	render_view_init(&view, config.board_x_resolution, config.board_y_resolution, config.hud_x_resolution,
+	render_view_init(&render_view, config.board_x_resolution, config.board_y_resolution, config.hud_x_resolution,
 					 config.hud_y_resolution);
-	render_data_init(&data);
+	render_data_init(&render_data);
 
-	app_prerender(&app, &view, &data);
-	upload_to_hud(&view);
+	hub75_init();
+	init_hub75_palette();
+	hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
+	hub75_start();
+
+	app_prerender(&app, &render_view, &render_data);
+	upload_to_hud(&render_view);
 
 	/* USER CODE END 2 */
 
@@ -288,8 +301,8 @@ int main(void) {
 	while (1) {
 		const uint32_t target_frame_us = fixed_dt_to_frame_us(app.config.fixed_dt);
 		const uint32_t frame_start_us = frame_timer_now_us();
-		const float frame_dt =
-			frame_dt_from_elapsed_us(frame_timer_elapsed_us(previous_frame_start_us, frame_start_us), app.config.fixed_dt);
+		const float frame_dt = frame_dt_from_elapsed_us(frame_timer_elapsed_us(previous_frame_start_us, frame_start_us),
+														app.config.fixed_dt);
 		previous_frame_start_us = frame_start_us;
 
 		InputFrame input;
@@ -297,12 +310,12 @@ int main(void) {
 
 		// Update and render
 		if (app_update(&app, &input, frame_dt) == UPDATE_CHANGED_SCENE) {
-			app_prerender(&app, &view, &data);
+			app_prerender(&app, &render_view, &render_data);
 		}
-		app_render(&app, &view, &data);
+		app_render(&app, &render_view, &render_data);
 
-		// Upload to HUD
-		upload_to_hud(&view);
+		hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
+		upload_to_hud(&render_view);
 
 		/* USER CODE END WHILE */
 
@@ -682,48 +695,6 @@ static void MX_USART2_UART_Init(void) {
 }
 
 /**
- * @brief USART3 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_USART3_UART_Init(void) {
-
-	/* USER CODE BEGIN USART3_Init 0 */
-
-	/* USER CODE END USART3_Init 0 */
-
-	/* USER CODE BEGIN USART3_Init 1 */
-
-	/* USER CODE END USART3_Init 1 */
-	huart3.Instance = USART3;
-	huart3.Init.BaudRate = 115200;
-	huart3.Init.WordLength = UART_WORDLENGTH_8B;
-	huart3.Init.StopBits = UART_STOPBITS_1;
-	huart3.Init.Parity = UART_PARITY_NONE;
-	huart3.Init.Mode = UART_MODE_TX_RX;
-	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart3) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK) {
-		Error_Handler();
-	}
-	/* USER CODE BEGIN USART3_Init 2 */
-
-	/* USER CODE END USART3_Init 2 */
-}
-
-/**
  * @brief SAI1 Initialization Function
  * @param None
  * @retval None
@@ -1091,53 +1062,6 @@ static void MX_TIM3_Init(void) {
 }
 
 /**
- * @brief TIM4 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_TIM4_Init(void) {
-
-	/* USER CODE BEGIN TIM4_Init 0 */
-
-	/* USER CODE END TIM4_Init 0 */
-
-	TIM_MasterConfigTypeDef sMasterConfig = {0};
-	TIM_OC_InitTypeDef sConfigOC = {0};
-
-	/* USER CODE BEGIN TIM4_Init 1 */
-
-	/* USER CODE END TIM4_Init 1 */
-	htim4.Instance = TIM4;
-	htim4.Init.Prescaler = 0;
-	htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim4.Init.Period = 65535;
-	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	if (HAL_TIM_PWM_Init(&htim4) != HAL_OK) {
-		Error_Handler();
-	}
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK) {
-		Error_Handler();
-	}
-	sConfigOC.OCMode = TIM_OCMODE_PWM1;
-	sConfigOC.Pulse = 0;
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4) != HAL_OK) {
-		Error_Handler();
-	}
-	/* USER CODE BEGIN TIM4_Init 2 */
-
-	/* USER CODE END TIM4_Init 2 */
-	HAL_TIM_MspPostInit(&htim4);
-}
-
-/**
  * @brief TIM15 Initialization Function
  * @param None
  * @retval None
@@ -1148,21 +1072,24 @@ static void MX_TIM15_Init(void) {
 
 	/* USER CODE END TIM15_Init 0 */
 
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
-	TIM_OC_InitTypeDef sConfigOC = {0};
-	TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
 	/* USER CODE BEGIN TIM15_Init 1 */
 
 	/* USER CODE END TIM15_Init 1 */
 	htim15.Instance = TIM15;
-	htim15.Init.Prescaler = 0;
+	htim15.Init.Prescaler = 119;
 	htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim15.Init.Period = 65535;
+	htim15.Init.Period = 59;
 	htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim15.Init.RepetitionCounter = 0;
 	htim15.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	if (HAL_TIM_PWM_Init(&htim15) != HAL_OK) {
+	if (HAL_TIM_Base_Init(&htim15) != HAL_OK) {
+		Error_Handler();
+	}
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	if (HAL_TIM_ConfigClockSource(&htim15, &sClockSourceConfig) != HAL_OK) {
 		Error_Handler();
 	}
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
@@ -1170,30 +1097,9 @@ static void MX_TIM15_Init(void) {
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim15, &sMasterConfig) != HAL_OK) {
 		Error_Handler();
 	}
-	sConfigOC.OCMode = TIM_OCMODE_PWM1;
-	sConfigOC.Pulse = 0;
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
-	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-	if (HAL_TIM_PWM_ConfigChannel(&htim15, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
-		Error_Handler();
-	}
-	sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
-	sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-	sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-	sBreakDeadTimeConfig.DeadTime = 0;
-	sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-	sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-	sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-	if (HAL_TIMEx_ConfigBreakDeadTime(&htim15, &sBreakDeadTimeConfig) != HAL_OK) {
-		Error_Handler();
-	}
 	/* USER CODE BEGIN TIM15_Init 2 */
 
 	/* USER CODE END TIM15_Init 2 */
-	HAL_TIM_MspPostInit(&htim15);
 }
 
 /**
@@ -1248,12 +1154,24 @@ static void MX_GPIO_Init(void) {
 	__HAL_RCC_GPIOH_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOG_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
 	HAL_PWREx_EnableVddIO2();
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOF, GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOD,
+					  GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15,
+					  GPIO_PIN_RESET);
 
 	/*Configure GPIO pins : PA0 PA1 PA4 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
@@ -1261,6 +1179,29 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PF12 PF13 PF14 PF15 */
+	GPIO_InitStruct.Pin = GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PG0 PG1 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PD8 PD10 PD11 PD12
+							 PD13 PD14 PD15 */
+	GPIO_InitStruct.Pin =
+		GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PC8 PC9 PC10 PC11
 							 PC12 */

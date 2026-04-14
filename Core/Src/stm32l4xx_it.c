@@ -22,6 +22,7 @@
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "hub75.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +58,7 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_spi1_tx;
 extern SPI_HandleTypeDef hspi1;
+extern TIM_HandleTypeDef htim15;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -211,6 +213,25 @@ void DMA1_Channel1_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
 
   /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM1 break interrupt and TIM15 global interrupt.
+  */
+void TIM1_BRK_TIM15_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM1_BRK_TIM15_IRQn 0 */
+  if (__HAL_TIM_GET_FLAG(&htim15, TIM_FLAG_UPDATE) != RESET &&
+      __HAL_TIM_GET_IT_SOURCE(&htim15, TIM_IT_UPDATE) != RESET)
+  {
+    htim15.Instance->SR = (uint32_t)~((uint32_t)TIM_FLAG_UPDATE);
+    hub75_irq_handler();
+  }
+
+  /* USER CODE END TIM1_BRK_TIM15_IRQn 0 */
+  /* USER CODE BEGIN TIM1_BRK_TIM15_IRQn 1 */
+
+  /* USER CODE END TIM1_BRK_TIM15_IRQn 1 */
 }
 
 /**
