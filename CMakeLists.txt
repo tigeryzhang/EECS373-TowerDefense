@@ -58,6 +58,10 @@ set(TFT_DISPLAY_SOURCES
     libs/tft_display/ili9488.c
 )
 
+set(HUB75_DISPLAY_SOURCES
+    libs/hub75_display/hub75.c
+)
+
 add_library(pvz STATIC)
 target_sources(pvz PRIVATE ${PVZ_SOURCES})
 target_include_directories(pvz PUBLIC
@@ -72,6 +76,13 @@ target_include_directories(tft_display PUBLIC
 )
 target_link_libraries(tft_display PUBLIC stm32cubemx)
 
+add_library(hub75_display STATIC)
+target_sources(hub75_display PRIVATE ${HUB75_DISPLAY_SOURCES})
+target_include_directories(hub75_display PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/hub75_display
+)
+target_link_libraries(hub75_display PUBLIC stm32cubemx)
+
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${APP_SOURCES})
 
 # Remove wrong libob.a library dependency when using cpp files
@@ -82,4 +93,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     pvz
     tft_display
+    hub75_display
 )

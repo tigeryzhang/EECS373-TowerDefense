@@ -59,7 +59,7 @@ void pvz_clamp_config(GameConfig *config) {
 	config->wallnut_seed_cooldown = clamp_int(config->wallnut_seed_cooldown, 0, 600);
 
 	if (config->fixed_dt <= 0.0f) {
-		config->fixed_dt = PVZ_DEFAULT_FIXED_DT;
+		config->fixed_dt = 1.0f / 30.0f;
 	}
 }
 
