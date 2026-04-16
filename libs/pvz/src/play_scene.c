@@ -79,6 +79,15 @@ static void play_scene_handle_command(Scene *scene, AppContext *app, InputComman
 			state, result == GAME_COMMAND_RESULT_OK ? RENDER_STATUS_REMOVED : command_result_status(result), 1.2f);
 		break;
 	}
+	case INPUT_COMMAND_SUN_PICKUP: {
+    GameCommandResult result = game_apply_command(&state->game, (GameCommand){
+        .type = GAME_COMMAND_COLLECT_SUN,
+    });
+    if (result == GAME_COMMAND_RESULT_OK) {
+        play_scene_set_status(state, RENDER_STATUS_NONE, 0.0f);
+    }
+    break;
+	}
 	case INPUT_COMMAND_TOGGLE_PAUSE:
 		game_apply_command(&state->game, (GameCommand){.type = GAME_COMMAND_TOGGLE_PAUSE});
 		play_scene_set_status(state, RENDER_STATUS_NONE, 0.0f);
@@ -92,6 +101,7 @@ static void play_scene_handle_command(Scene *scene, AppContext *app, InputComman
 		break;
 	case INPUT_COMMAND_GOTO_PLAY_SCENE:
 	case INPUT_COMMAND_NONE:
+
 	default:
 		break;
 	}
