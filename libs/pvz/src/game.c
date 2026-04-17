@@ -1006,7 +1006,7 @@ void game_get_wave_status(const GameState *state, GameWaveStatus *status) {
 	}
 }
 
-static bool collect_first_active_sun(GameState *state) {
+static void collect_sun(GameState *state) {
 	for (int i = 0; i < PVZ_MAX_SUNS; ++i) {
 		if (!state->suns[i].active) {
 			continue;
@@ -1014,10 +1014,7 @@ static bool collect_first_active_sun(GameState *state) {
 
 		state->sun_count += state->suns[i].value;
 		state->suns[i].active = false;
-		return true;
 	}
-
-	return false;
 }
 
 GameCommandResult game_apply_command(GameState *state, GameCommand command) {
@@ -1082,11 +1079,8 @@ GameCommandResult game_apply_command(GameState *state, GameCommand command) {
 		result = GAME_COMMAND_RESULT_OK;
 		break;
 	case GAME_COMMAND_COLLECT_SUN:
-		if (collect_first_active_sun(state)) {
-			result = GAME_COMMAND_RESULT_OK;
-		} else {
-			result = GAME_COMMAND_RESULT_NOT_FOUND;
-		}
+		collect_sun(state);
+		result = GAME_COMMAND_RESULT_OK;
 		break;
 	case GAME_COMMAND_NONE:
 	default:
