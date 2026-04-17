@@ -3,13 +3,17 @@
 #include <string.h>
 
 enum {
+	// CV must agree for this many frames before a tile change is trusted.
 	PVZ_FRONTEND_DEBOUNCE_FRAMES = 3,
+	// After a hand is seen, ignore CV updates for a short grace window.
 	PVZ_FRONTEND_HAND_GRACE_MS = 1000,
 };
 
+// Short success/error flashes shown around board tiles.
 static const float PVZ_FRONTEND_FLASH_SUCCESS_SEC = 0.4f;
 static const float PVZ_FRONTEND_FLASH_WARNING_SEC = 0.75f;
 
+// Collapse any unsupported piece encoding down to "no piece".
 static PlantType normalize_piece_type(PlantType type) {
 	switch (type) {
 	case PLANT_SUNFLOWER:
@@ -22,14 +26,17 @@ static PlantType normalize_piece_type(PlantType type) {
 	}
 }
 
+// Handles timer wraparound safely for the hand-suppression deadline.
 static bool deadline_is_in_future(uint32_t now_ms, uint32_t deadline_ms) {
 	return (int32_t)(deadline_ms - now_ms) > 0;
 }
 
+// Frontend helpers operate on board coordinates repeatedly, so centralize the bounds check.
 static bool coord_in_bounds(const GameConfig *config, BoardCoord coord) {
 	return config && coord.row >= 0 && coord.row < config->rows && coord.col >= 0 && coord.col < config->cols;
 }
 
+// Physical pieces still emulate the existing seed-packet input model.
 static int plant_card_index(PlantType type) {
 	switch (type) {
 	case PLANT_SUNFLOWER:
@@ -44,6 +51,7 @@ static int plant_card_index(PlantType type) {
 	}
 }
 
+// Reads the live in-game plant type for a tile without exposing plant-slot details elsewhere.
 static PlantType game_plant_type_at(const GameState *game, BoardCoord coord) {
 	if (!game || !coord_in_bounds(game->config, coord)) {
 		return PLANT_NONE;
@@ -60,6 +68,7 @@ static PlantType game_plant_type_at(const GameState *game, BoardCoord coord) {
 	return game->plants[plant_index].type;
 }
 
+// Starts a temporary border flash on a tile.
 static void start_tile_flash(PvzFrontendState *state, BoardCoord coord, RenderPalette palette, float duration_sec) {
 	if (!state || !coord_in_bounds(state->config, coord)) {
 		return;
@@ -71,6 +80,7 @@ static void start_tile_flash(PvzFrontendState *state, BoardCoord coord, RenderPa
 	tile->flash_timer_sec = duration_sec;
 }
 
+// Clears the one outstanding emulated command this frontend tracks at a time.
 static void clear_pending_action(PvzFrontendState *state) {
 	if (!state) {
 		return;
@@ -81,6 +91,7 @@ static void clear_pending_action(PvzFrontendState *state) {
 	state->pending_plant_type = PLANT_NONE;
 }
 
+// A tile must be seen empty again before a lingering piece can place once more.
 static void disarm_tile(PvzFrontendState *state, BoardCoord coord) {
 	if (!state || !coord_in_bounds(state->config, coord)) {
 		return;
@@ -89,6 +100,7 @@ static void disarm_tile(PvzFrontendState *state, BoardCoord coord) {
 	state->tile_armed[coord.row][coord.col] = false;
 }
 
+// Empty stable tiles re-arm placement and clear any stale remove warning.
 static void refresh_tile_latches(PvzFrontendState *state) {
 	if (!state || !state->config) {
 		return;
@@ -105,6 +117,7 @@ static void refresh_tile_latches(PvzFrontendState *state) {
 	}
 }
 
+// Per-frame decay for the transient tile feedback effects.
 static void advance_flash_timers(PvzFrontendState *state, float frame_dt) {
 	if (!state || !state->config) {
 		return;
@@ -126,6 +139,7 @@ static void advance_flash_timers(PvzFrontendState *state, float frame_dt) {
 	}
 }
 
+// Marks a tile that disappeared in-game while a physical piece may still be present.
 static void note_game_driven_removal(PvzFrontendState *state, BoardCoord coord) {
 	if (!state || !coord_in_bounds(state->config, coord)) {
 		return;
@@ -136,6 +150,7 @@ static void note_game_driven_removal(PvzFrontendState *state, BoardCoord coord) 
 	state->tiles[coord.row][coord.col].remove_required = state->stable_board[coord.row][coord.col] != PLANT_NONE;
 }
 
+// Maps a completed placement attempt back into player-facing tile feedback.
 static void handle_pending_place_result(PvzFrontendState *state, GameCommandResult result) {
 	const BoardCoord coord = state->pending_coord;
 
@@ -160,6 +175,7 @@ static void handle_pending_place_result(PvzFrontendState *state, GameCommandResu
 	}
 }
 
+// Maps a completed removal attempt back into player-facing tile feedback.
 static void handle_pending_remove_result(PvzFrontendState *state, GameCommandResult result) {
 	const BoardCoord coord = state->pending_coord;
 
@@ -178,6 +194,16 @@ static void handle_pending_remove_result(PvzFrontendState *state, GameCommandRes
 	}
 }
 
+// Small helper for scripted testing so the timeline stays readable.
+static void set_stub_piece(PvzFrontendSnapshot *snapshot, const GameConfig *config, int row, int col, PlantType type) {
+	if (!snapshot || !coord_in_bounds(config, (BoardCoord){row, col})) {
+		return;
+	}
+
+	snapshot->observed_piece[row][col] = type;
+}
+
+// Resets frontend-owned CV, debounce, command, and tile-feedback state.
 void pvz_frontend_init(PvzFrontendState *state, const GameConfig *config) {
 	if (!state) {
 		return;
@@ -197,6 +223,7 @@ void pvz_frontend_init(PvzFrontendState *state, const GameConfig *config) {
 	}
 }
 
+// Temporary development source until real UART/CV snapshots are wired in.
 void pvz_frontend_fill_stub_snapshot(PvzFrontendSnapshot *snapshot, const GameConfig *config) {
 	if (!snapshot) {
 		return;
@@ -220,6 +247,71 @@ void pvz_frontend_fill_stub_snapshot(PvzFrontendSnapshot *snapshot, const GameCo
 	}
 }
 
+// Temporary timeline-based test script. It loops so startup behavior is easy to observe repeatedly.
+void pvz_frontend_fill_scripted_stub_snapshot(PvzFrontendSnapshot *snapshot, const GameConfig *config, uint32_t now_ms) {
+	if (!snapshot) {
+		return;
+	}
+
+	memset(snapshot, 0, sizeof(*snapshot));
+	if (!config || config->rows <= 0 || config->cols <= 0) {
+		return;
+	}
+
+	const uint32_t phase_ms = now_ms % 16000u;
+
+	if (phase_ms < 1000u) {
+		// 0.0s - 1.0s: start empty.
+		return;
+	}
+	if (phase_ms < 3000u) {
+		// 1.0s - 3.0s: place a sunflower.
+		set_stub_piece(snapshot, config, 0, 0, PLANT_SUNFLOWER);
+		return;
+	}
+	if (phase_ms < 5000u) {
+		// 3.0s - 5.0s: add a peashooter.
+		set_stub_piece(snapshot, config, 0, 0, PLANT_SUNFLOWER);
+		set_stub_piece(snapshot, config, 1, 1, PLANT_PEASHOOTER);
+		return;
+	}
+	if (phase_ms < 7000u) {
+		// 5.0s - 7.0s: remove the sunflower.
+		set_stub_piece(snapshot, config, 1, 1, PLANT_PEASHOOTER);
+		return;
+	}
+	if (phase_ms < 9000u) {
+		// 7.0s - 9.0s: add a wallnut.
+		set_stub_piece(snapshot, config, 1, 1, PLANT_PEASHOOTER);
+		set_stub_piece(snapshot, config, 2, 2, PLANT_WALLNUT);
+		return;
+	}
+	if (phase_ms < 10500u) {
+		// 9.0s - 10.5s: show all three together.
+		set_stub_piece(snapshot, config, 0, 0, PLANT_SUNFLOWER);
+		set_stub_piece(snapshot, config, 1, 1, PLANT_PEASHOOTER);
+		set_stub_piece(snapshot, config, 2, 2, PLANT_WALLNUT);
+		return;
+	}
+	if (phase_ms < 11500u) {
+		// 10.5s - 11.5s: simulate a hand moving pieces around.
+		snapshot->hand_present = true;
+		set_stub_piece(snapshot, config, 0, 0, PLANT_SUNFLOWER);
+		set_stub_piece(snapshot, config, 1, 1, PLANT_PEASHOOTER);
+		set_stub_piece(snapshot, config, 2, 2, PLANT_WALLNUT);
+		return;
+	}
+	if (phase_ms < 13500u) {
+		// 11.5s - 13.5s: after the hand clears, move the sunflower and remove the peashooter.
+		set_stub_piece(snapshot, config, 0, config->cols - 1, PLANT_SUNFLOWER);
+		set_stub_piece(snapshot, config, 2, 2, PLANT_WALLNUT);
+		return;
+	}
+
+	// 13.5s - 16.0s: clear the board before the script loops.
+}
+
+// Ingests the latest observed board, applying hand suppression and tile debounce.
 void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnapshot *snapshot, uint32_t now_ms) {
 	if (!state || !state->config || !snapshot) {
 		return;
@@ -260,6 +352,7 @@ void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnap
 	refresh_tile_latches(state);
 }
 
+// Compares stable physical state against live game state and emits at most one emulated action.
 void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, InputFrame *input, bool play_scene_active) {
 	if (!state || !game || !input || !state->config || !play_scene_active) {
 		return;
@@ -317,6 +410,7 @@ void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, In
 	}
 }
 
+// Consumes game results after update: expire flashes, resolve pending actions, and detect eaten plants.
 void pvz_frontend_post_update(PvzFrontendState *state, const GameState *previous, const GameState *current, float frame_dt,
 							  bool play_scene_active) {
 	if (!state || !state->config) {
@@ -360,6 +454,7 @@ void pvz_frontend_post_update(PvzFrontendState *state, const GameState *previous
 	refresh_tile_latches(state);
 }
 
+// Converts frontend-owned tile state into board overlays for the renderer.
 void pvz_frontend_export_presentation_state(const PvzFrontendState *state, const GameState *game,
 											PlayPresentationState *out_state) {
 	if (!state || !out_state) {

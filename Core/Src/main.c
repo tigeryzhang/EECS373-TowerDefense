@@ -282,7 +282,8 @@ int main(void) {
 	pvz_frontend_init(&pvz_frontend, &app.config);
 
 	PvzFrontendSnapshot frontend_snapshot;
-	pvz_frontend_fill_stub_snapshot(&frontend_snapshot, &app.config);
+	// Temporary scripted CV stub. Swap this one call when real UART input is ready.
+	pvz_frontend_fill_scripted_stub_snapshot(&frontend_snapshot, &app.config, 0);
 	pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, 0);
 	pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
 
@@ -316,7 +317,8 @@ int main(void) {
 
 		InputFrame input;
 		input_frame_reset(&input);
-		pvz_frontend_fill_stub_snapshot(&frontend_snapshot, &app.config);
+		// TODO: Temporary scripted stub. Replace this with the UART-fed snapshot later.
+		pvz_frontend_fill_scripted_stub_snapshot(&frontend_snapshot, &app.config, frame_start_us / 1000u);
 		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_us / 1000u);
 		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
 		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
