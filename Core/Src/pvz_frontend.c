@@ -488,7 +488,7 @@ void pvz_frontend_export_presentation_state(const PvzFrontendState *state, const
 				continue;
 			}
 			if (stable_piece == live_plant) {
-				tile->valid_corners = true;
+				tile->plant_valid = true;
 			} else if (stable_piece != PLANT_NONE) {
 				tile->mismatch_warning = true;
 			}

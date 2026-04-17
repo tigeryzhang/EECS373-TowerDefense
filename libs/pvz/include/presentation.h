@@ -58,7 +58,7 @@ typedef enum {
 typedef enum { RENDER_TARGET_BOARD = 0, RENDER_TARGET_HUD } RenderTarget;
 
 typedef struct {
-	bool valid_corners;
+	bool plant_valid;
 	bool remove_required;
 	bool mismatch_warning;
 	bool flash_active;

@@ -31,7 +31,7 @@ static const PaletteRgb palette_rgb[] = {
 	[RENDER_PALETTE_BLACK] = {0, 0, 0},
 	[RENDER_PALETTE_PANEL] = {233, 223, 187},
 	[RENDER_PALETTE_TILE_LIGHT] = {149, 196, 82},
-	[RENDER_PALETTE_TILE_DARK] = {122, 168, 62},
+	[RENDER_PALETTE_TILE_DARK] = {35, 120, 16},
 	[RENDER_PALETTE_HIGHLIGHT] = {255, 208, 78},
 	[RENDER_PALETTE_TEXT] = {49, 46, 37},
 	[RENDER_PALETTE_SUN] = {255, 198, 48},
@@ -364,6 +364,40 @@ static void draw_tile_checkerboard(RenderView *view, const GameState *game, cons
 	}
 }
 
+static void draw_tile_corner_guides(RenderView *view, const GameState *game, const IntRect *clip) {
+	for (int row = 0; row < game->config->rows; ++row) {
+		for (int col = 0; col < game->config->cols; ++col) {
+			const IntRect rect = board_cell_rect(game, row, col, 0);
+			const RenderPalette palette = ((row + col) % 2 == 0) ? RENDER_PALETTE_TILE_LIGHT : RENDER_PALETTE_TILE_DARK;
+			const int thickness = 1;
+			const int span_x = clamp_int(rect.w / 4, 1, rect.w);
+			const int span_y = clamp_int(rect.h / 4, 1, rect.h);
+
+			draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, span_x, thickness), palette, 0,
+							  clip);
+			draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, thickness, span_y), palette, 0,
+							  clip);
+
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x + rect.w - span_x, rect.y, span_x, thickness), palette, 0, clip);
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x + rect.w - thickness, rect.y, thickness, span_y), palette, 0, clip);
+
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x, rect.y + rect.h - thickness, span_x, thickness), palette, 0, clip);
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x, rect.y + rect.h - span_y, thickness, span_y), palette, 0, clip);
+
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x + rect.w - span_x, rect.y + rect.h - thickness, span_x, thickness),
+							  palette, 0, clip);
+			draw_rect_clipped(view, RENDER_TARGET_BOARD,
+							  pvz_rect_make(rect.x + rect.w - thickness, rect.y + rect.h - span_y, thickness, span_y),
+							  palette, 0, clip);
+		}
+	}
+}
+
 static void draw_zombie_fallback_clipped(RenderView *view, ZombieType type, IntRect rect, const IntRect *clip) {
 	const int head = rect.h / 4 > 0 ? rect.h / 4 : 1;
 	const int body_w = rect.w / 3 > 0 ? rect.w / 3 : 1;
@@ -614,8 +648,9 @@ static void draw_card(RenderView *view, const RenderData *data, const GameConfig
 	char buffer[16];
 	const RenderSprite *plant_sprite = render_assets_get_plant_sprite(type);
 	const IntRect rect = determine_card_position(view, index);
-	const bool selected =
-		!presentation_state || !presentation_state->suppress_card_selection ? data->frame.selected_plant == type : false;
+	const bool selected = !presentation_state || !presentation_state->suppress_card_selection
+							  ? data->frame.selected_plant == type
+							  : false;
 	const RenderPalette fill = selected ? RENDER_PALETTE_TILE_DARK : RENDER_PALETTE_TILE_DARK;
 	const RenderPalette outline = RENDER_PALETTE_TEXT;
 
@@ -666,34 +701,25 @@ static void update_text_element(RenderView *view, const char *previous, const ch
 	mark_dirty_rect(view, RENDER_TARGET_HUD, dirty);
 }
 
-static void draw_corner_markers(RenderView *view, IntRect rect, RenderPalette palette, const IntRect *clip) {
-	const int thickness = rect.w >= 10 && rect.h >= 10 ? 2 : 1;
+static void draw_plant_markers(RenderView *view, IntRect rect, RenderPalette palette, const IntRect *clip) {
+	const int thickness = 1;
 	const int span_x = clamp_int(rect.w / 3, 1, rect.w);
 	const int span_y = clamp_int(rect.h / 3, 1, rect.h);
+	const int horizontal_x = rect.x + (rect.w - span_x) / 2;
+	const int vertical_y = rect.y + (rect.h - span_y) / 2;
 
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, span_x, thickness), palette, 0, clip);
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, thickness, span_y), palette, 0, clip);
-
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x + rect.w - span_x, rect.y, span_x, thickness),
-					  palette, 0, clip);
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x + rect.w - thickness, rect.y, thickness, span_y),
-					  palette, 0, clip);
-
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y + rect.h - thickness, span_x, thickness),
-					  palette, 0, clip);
-	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y + rect.h - span_y, thickness, span_y),
-					  palette, 0, clip);
-
-	draw_rect_clipped(view, RENDER_TARGET_BOARD,
-					  pvz_rect_make(rect.x + rect.w - span_x, rect.y + rect.h - thickness, span_x, thickness), palette, 0,
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(horizontal_x, rect.y, span_x, thickness), palette, 0,
 					  clip);
 	draw_rect_clipped(view, RENDER_TARGET_BOARD,
-					  pvz_rect_make(rect.x + rect.w - thickness, rect.y + rect.h - span_y, thickness, span_y), palette, 0,
+					  pvz_rect_make(horizontal_x, rect.y + rect.h - thickness, span_x, thickness), palette, 0, clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, vertical_y, thickness, span_y), palette, 0,
 					  clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD,
+					  pvz_rect_make(rect.x + rect.w - thickness, vertical_y, thickness, span_y), palette, 0, clip);
 }
 
-static void draw_board_feedback(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
-								const IntRect *clip) {
+static void draw_board_feedback(RenderView *view, const GameState *game,
+								const PlayPresentationState *presentation_state, const IntRect *clip) {
 	if (!physical_mode_enabled(presentation_state)) {
 		return;
 	}
@@ -716,15 +742,16 @@ static void draw_board_feedback(RenderView *view, const GameState *game, const P
 				draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, RENDER_PALETTE_HIGHLIGHT, thickness, clip);
 				continue;
 			}
-			if (tile->valid_corners) {
-				draw_corner_markers(view, rect, RENDER_PALETTE_SUCCESS, clip);
+			if (tile->plant_valid) {
+				draw_plant_markers(view, rect, RENDER_PALETTE_SUCCESS, clip);
 			}
 		}
 	}
 }
 
-static void draw_board_entities(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
-								const IntRect *clip, int plant_padding, int zombie_size, int projectile_size, int sun_size) {
+static void draw_board_entities(RenderView *view, const GameState *game,
+								const PlayPresentationState *presentation_state, const IntRect *clip, int plant_padding,
+								int zombie_size, int projectile_size, int sun_size) {
 	if (!physical_mode_enabled(presentation_state)) {
 		for (int i = 0; i < PVZ_MAX_PLANTS; ++i) {
 			if (!game->plants[i].active) {
@@ -750,12 +777,12 @@ static void draw_board_entities(RenderView *view, const GameState *game, const P
 		if (!game->projectiles[i].active) {
 			continue;
 		}
-		const float projectile_center_x = physical_mode_enabled(presentation_state) ? game->projectiles[i].x
-																				 : game->projectiles[i].x + 0.1f;
-		draw_projectile_clipped(view,
-								board_entity_rect(game, (float)game->projectiles[i].lane + 0.5f, projectile_center_x,
-												  projectile_size),
-								clip);
+		const float projectile_center_x =
+			physical_mode_enabled(presentation_state) ? game->projectiles[i].x : game->projectiles[i].x + 0.1f;
+		draw_projectile_clipped(
+			view,
+			board_entity_rect(game, (float)game->projectiles[i].lane + 0.5f, projectile_center_x, projectile_size),
+			clip);
 	}
 
 	for (int i = 0; i < PVZ_MAX_SUNS; ++i) {
@@ -767,12 +794,17 @@ static void draw_board_entities(RenderView *view, const GameState *game, const P
 	}
 }
 
-static void draw_play_board_full(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
-								 int plant_padding, int zombie_size, int projectile_size, int sun_size) {
+static void draw_play_board_full(RenderView *view, const GameState *game,
+								 const PlayPresentationState *presentation_state, int plant_padding, int zombie_size,
+								 int projectile_size, int sun_size) {
 	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
-	draw_tile_checkerboard(view, game, NULL);
-	draw_board_entities(view, game, presentation_state, NULL, plant_padding, zombie_size, projectile_size, sun_size);
+	if (physical_mode_enabled(presentation_state)) {
+		draw_tile_corner_guides(view, game, NULL);
+	} else {
+		draw_tile_checkerboard(view, game, NULL);
+	}
 	draw_board_feedback(view, game, presentation_state, NULL);
+	draw_board_entities(view, game, presentation_state, NULL, plant_padding, zombie_size, projectile_size, sun_size);
 }
 
 static void draw_play_hud_static(RenderView *view, const RenderData *data, const GameState *game,
@@ -860,9 +892,8 @@ void presentation_prerender_play_view(RenderView *view, RenderData *data, const 
 	const int unit_size = board_unit_size(game->config);
 	const int plant_padding = unit_size / 8 > 0 ? unit_size / 8 : 1;
 	const int zombie_size = 8;
-	const int projectile_size = physical_mode_enabled(presentation_state)
-									? (unit_size / 4 > 1 ? unit_size / 4 : 2)
-									: (unit_size / 5 > 0 ? unit_size / 5 : 1);
+	const int projectile_size = physical_mode_enabled(presentation_state) ? (unit_size / 4 > 1 ? unit_size / 4 : 2)
+																		  : (unit_size / 5 > 0 ? unit_size / 5 : 1);
 	const int sun_size = unit_size / 3 > 0 ? unit_size / 3 : 1;
 
 	render_data_update(data, game, RENDER_STATUS_NONE);
@@ -883,9 +914,8 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 	const int unit_size = board_unit_size(game->config);
 	const int plant_padding = unit_size / 8 > 0 ? unit_size / 8 : 1;
 	const int zombie_size = 8;
-	const int projectile_size = physical_mode_enabled(presentation_state)
-									? (unit_size / 4 > 1 ? unit_size / 4 : 2)
-									: (unit_size / 5 > 0 ? unit_size / 5 : 1);
+	const int projectile_size = physical_mode_enabled(presentation_state) ? (unit_size / 4 > 1 ? unit_size / 4 : 2)
+																		  : (unit_size / 5 > 0 ? unit_size / 5 : 1);
 	const int sun_size = unit_size / 3 > 0 ? unit_size / 3 : 1;
 	char previous_text[24];
 	char current_text[24];
