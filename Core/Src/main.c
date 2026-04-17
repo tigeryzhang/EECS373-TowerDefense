@@ -31,6 +31,8 @@
 #include "stm32l4xx_hal.h"
 
 #include <stdbool.h>
+
+#include "pvz_frontend.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,6 +86,7 @@ TIM_HandleTypeDef htim15;
 static RAM3_BSS RenderView render_view;
 static AppContext app;
 static RenderData render_data;
+static PvzFrontendState pvz_frontend;
 
 /* USER CODE END PV */
 
@@ -273,8 +276,15 @@ int main(void) {
 	ILI9488_SetRotation(1);
 
 	GameConfig config = pvz_make_default_config();
+	config.start_with_demo_layout = false;
 
 	app_init(&app, &config);
+	pvz_frontend_init(&pvz_frontend, &app.config);
+
+	PvzFrontendSnapshot frontend_snapshot;
+	pvz_frontend_fill_stub_snapshot(&frontend_snapshot, &app.config);
+	pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, 0);
+	pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
 
 	render_view_init(&render_view, config.board_x_resolution, config.board_y_resolution, config.hud_x_resolution,
 					 config.hud_y_resolution);
@@ -306,9 +316,17 @@ int main(void) {
 
 		InputFrame input;
 		input_frame_reset(&input);
+		pvz_frontend_fill_stub_snapshot(&frontend_snapshot, &app.config);
+		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_us / 1000u);
+		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
+		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
 
 		// Update and render
-		if (app_update(&app, &input, frame_dt) == UPDATE_CHANGED_SCENE) {
+		const UpdateResult update_result = app_update(&app, &input, frame_dt);
+		pvz_frontend_post_update(&pvz_frontend, &app.play_state.prev_game_state, &app.play_state.game, frame_dt,
+								 play_scene_was_active);
+		pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
+		if (update_result == UPDATE_CHANGED_SCENE) {
 			app_prerender(&app, &render_view, &render_data);
 		}
 		app_render(&app, &render_view, &render_data);

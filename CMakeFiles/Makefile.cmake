@@ -70,5 +70,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/pvz-with-hud.dir/DependInfo.cmake"
   "CMakeFiles/pvz.dir/DependInfo.cmake"
   "CMakeFiles/tft_display.dir/DependInfo.cmake"
+  "CMakeFiles/hub75_display.dir/DependInfo.cmake"
   "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/DependInfo.cmake"
   )

@@ -27,6 +27,7 @@ typedef struct AppContext {
 	Scene play_scene;
 	Scene placeholder_scene;
 	PlaySceneState play_state;
+	PlayPresentationState play_presentation;
 	PlaceholderSceneState placeholder_state;
 } AppContext;
 

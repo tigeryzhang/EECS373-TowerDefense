@@ -28,11 +28,13 @@ set(CMAKE_ASM_TARGET_INCLUDE_PATH
   "cmake/stm32cubemx/../../Drivers/CMSIS/Include"
   "libs/pvz/include"
   "libs/tft_display"
+  "libs/hub75_display"
   )
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/main.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.o.d"
+  "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/pvz_frontend.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.o.d"
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/stm32l4xx_hal_msp.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o.d"
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/stm32l4xx_it.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_it.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_it.c.o.d"
   "/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/Core/Src/syscalls.c" "CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o" "gcc" "CMakeFiles/pvz-with-hud.dir/Core/Src/syscalls.c.o.d"

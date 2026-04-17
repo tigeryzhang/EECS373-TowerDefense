@@ -112,6 +112,10 @@ static IntRect board_entity_rect(const GameState *game, float row_center, float 
 	return pvz_rect_make(center_x - size / 2, center_y - size / 2, size, size);
 }
 
+static bool physical_mode_enabled(const PlayPresentationState *state) {
+	return state != NULL && state->physical_mode_enabled;
+}
+
 static int board_unit_size(const GameConfig *config) {
 	const int cell_width = config->board_x_resolution / config->cols;
 	const int cell_height = config->board_y_resolution / config->rows;
@@ -605,11 +609,13 @@ static void draw_wave_warning(RenderView *view, const FrameData *frame) {
 				  RENDER_PALETTE_PANEL);
 }
 
-static void draw_card(RenderView *view, const RenderData *data, const GameConfig *config, int index, PlantType type) {
+static void draw_card(RenderView *view, const RenderData *data, const GameConfig *config,
+					  const PlayPresentationState *presentation_state, int index, PlantType type) {
 	char buffer[16];
 	const RenderSprite *plant_sprite = render_assets_get_plant_sprite(type);
 	const IntRect rect = determine_card_position(view, index);
-	const bool selected = data->frame.selected_plant == type;
+	const bool selected =
+		!presentation_state || !presentation_state->suppress_card_selection ? data->frame.selected_plant == type : false;
 	const RenderPalette fill = selected ? RENDER_PALETTE_TILE_DARK : RENDER_PALETTE_TILE_DARK;
 	const RenderPalette outline = RENDER_PALETTE_TEXT;
 
@@ -660,16 +666,75 @@ static void update_text_element(RenderView *view, const char *previous, const ch
 	mark_dirty_rect(view, RENDER_TARGET_HUD, dirty);
 }
 
-static void draw_board_entities(RenderView *view, const GameState *game, const IntRect *clip, int plant_padding,
-								int zombie_size, int projectile_size, int sun_size) {
-	for (int i = 0; i < PVZ_MAX_PLANTS; ++i) {
-		if (!game->plants[i].active) {
-			continue;
+static void draw_corner_markers(RenderView *view, IntRect rect, RenderPalette palette, const IntRect *clip) {
+	const int thickness = rect.w >= 10 && rect.h >= 10 ? 2 : 1;
+	const int span_x = clamp_int(rect.w / 3, 1, rect.w);
+	const int span_y = clamp_int(rect.h / 3, 1, rect.h);
+
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, span_x, thickness), palette, 0, clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y, thickness, span_y), palette, 0, clip);
+
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x + rect.w - span_x, rect.y, span_x, thickness),
+					  palette, 0, clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x + rect.w - thickness, rect.y, thickness, span_y),
+					  palette, 0, clip);
+
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y + rect.h - thickness, span_x, thickness),
+					  palette, 0, clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD, pvz_rect_make(rect.x, rect.y + rect.h - span_y, thickness, span_y),
+					  palette, 0, clip);
+
+	draw_rect_clipped(view, RENDER_TARGET_BOARD,
+					  pvz_rect_make(rect.x + rect.w - span_x, rect.y + rect.h - thickness, span_x, thickness), palette, 0,
+					  clip);
+	draw_rect_clipped(view, RENDER_TARGET_BOARD,
+					  pvz_rect_make(rect.x + rect.w - thickness, rect.y + rect.h - span_y, thickness, span_y), palette, 0,
+					  clip);
+}
+
+static void draw_board_feedback(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
+								const IntRect *clip) {
+	if (!physical_mode_enabled(presentation_state)) {
+		return;
+	}
+
+	for (int row = 0; row < game->config->rows; ++row) {
+		for (int col = 0; col < game->config->cols; ++col) {
+			const BoardTilePresentationState *tile = &presentation_state->tiles[row][col];
+			const IntRect rect = board_cell_rect(game, row, col, 0);
+			const int thickness = rect.w >= 10 && rect.h >= 10 ? 2 : 1;
+
+			if (tile->flash_active) {
+				draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, tile->flash_palette, thickness, clip);
+				continue;
+			}
+			if (tile->remove_required) {
+				draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, RENDER_PALETTE_WARNING, thickness, clip);
+				continue;
+			}
+			if (tile->mismatch_warning) {
+				draw_rect_clipped(view, RENDER_TARGET_BOARD, rect, RENDER_PALETTE_HIGHLIGHT, thickness, clip);
+				continue;
+			}
+			if (tile->valid_corners) {
+				draw_corner_markers(view, rect, RENDER_PALETTE_SUCCESS, clip);
+			}
 		}
-		const Plant *plant = &game->plants[i];
-		const RenderSprite *sprite = render_assets_get_plant_sprite(plant->type);
-		const IntRect rect = board_cell_rect(game, plant->coord.row, plant->coord.col, plant_padding);
-		draw_sprite_clipped(view, RENDER_TARGET_BOARD, sprite, rect.x, rect.y - 1, clip);
+	}
+}
+
+static void draw_board_entities(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
+								const IntRect *clip, int plant_padding, int zombie_size, int projectile_size, int sun_size) {
+	if (!physical_mode_enabled(presentation_state)) {
+		for (int i = 0; i < PVZ_MAX_PLANTS; ++i) {
+			if (!game->plants[i].active) {
+				continue;
+			}
+			const Plant *plant = &game->plants[i];
+			const RenderSprite *sprite = render_assets_get_plant_sprite(plant->type);
+			const IntRect rect = board_cell_rect(game, plant->coord.row, plant->coord.col, plant_padding);
+			draw_sprite_clipped(view, RENDER_TARGET_BOARD, sprite, rect.x, rect.y - 1, clip);
+		}
 	}
 
 	for (int i = 0; i < PVZ_MAX_ZOMBIES; ++i) {
@@ -685,9 +750,11 @@ static void draw_board_entities(RenderView *view, const GameState *game, const I
 		if (!game->projectiles[i].active) {
 			continue;
 		}
+		const float projectile_center_x = physical_mode_enabled(presentation_state) ? game->projectiles[i].x
+																				 : game->projectiles[i].x + 0.1f;
 		draw_projectile_clipped(view,
-								board_entity_rect(game, (float)game->projectiles[i].lane + 0.5f,
-												  game->projectiles[i].x + 0.1f, projectile_size),
+								board_entity_rect(game, (float)game->projectiles[i].lane + 0.5f, projectile_center_x,
+												  projectile_size),
 								clip);
 	}
 
@@ -700,20 +767,22 @@ static void draw_board_entities(RenderView *view, const GameState *game, const I
 	}
 }
 
-static void draw_play_board_full(RenderView *view, const GameState *game, int plant_padding, int zombie_size,
-								 int projectile_size, int sun_size) {
+static void draw_play_board_full(RenderView *view, const GameState *game, const PlayPresentationState *presentation_state,
+								 int plant_padding, int zombie_size, int projectile_size, int sun_size) {
 	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
 	draw_tile_checkerboard(view, game, NULL);
-	draw_board_entities(view, game, NULL, plant_padding, zombie_size, projectile_size, sun_size);
+	draw_board_entities(view, game, presentation_state, NULL, plant_padding, zombie_size, projectile_size, sun_size);
+	draw_board_feedback(view, game, presentation_state, NULL);
 }
 
-static void draw_play_hud_static(RenderView *view, const RenderData *data, const GameState *game) {
+static void draw_play_hud_static(RenderView *view, const RenderData *data, const GameState *game,
+								 const PlayPresentationState *presentation_state) {
 	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_PANEL);
 	draw_text_3x5(view, RENDER_TARGET_HUD, "SUN:", 10, 10, 3, RENDER_PALETTE_TEXT);
 	draw_wave_panel_base(view);
-	draw_card(view, data, game->config, 0, PLANT_SUNFLOWER);
-	draw_card(view, data, game->config, 1, PLANT_PEASHOOTER);
-	draw_card(view, data, game->config, 2, PLANT_WALLNUT);
+	draw_card(view, data, game->config, presentation_state, 0, PLANT_SUNFLOWER);
+	draw_card(view, data, game->config, presentation_state, 1, PLANT_PEASHOOTER);
+	draw_card(view, data, game->config, presentation_state, 2, PLANT_WALLNUT);
 }
 
 static void draw_play_hud_dynamic(RenderView *view, const RenderData *data, const GameState *game) {
@@ -786,17 +855,20 @@ void dirty_rect_list_clear(DirtyRectList *rects) {
 	rects->count = 0;
 }
 
-void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game) {
+void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game,
+									  const PlayPresentationState *presentation_state) {
 	const int unit_size = board_unit_size(game->config);
 	const int plant_padding = unit_size / 8 > 0 ? unit_size / 8 : 1;
 	const int zombie_size = 8;
-	const int projectile_size = unit_size / 5 > 0 ? unit_size / 5 : 1;
+	const int projectile_size = physical_mode_enabled(presentation_state)
+									? (unit_size / 4 > 1 ? unit_size / 4 : 2)
+									: (unit_size / 5 > 0 ? unit_size / 5 : 1);
 	const int sun_size = unit_size / 3 > 0 ? unit_size / 3 : 1;
 
 	render_data_update(data, game, RENDER_STATUS_NONE);
 
-	draw_play_board_full(view, game, plant_padding, zombie_size, projectile_size, sun_size);
-	draw_play_hud_static(view, data, game);
+	draw_play_board_full(view, game, presentation_state, plant_padding, zombie_size, projectile_size, sun_size);
+	draw_play_hud_static(view, data, game, presentation_state);
 	draw_play_hud_dynamic(view, data, game);
 
 	// Prerender seeds the retained framebuffers from scratch, so the first upload must cover both full targets.
@@ -806,11 +878,14 @@ void presentation_prerender_play_view(RenderView *view, RenderData *data, const 
 	render_data_commit_baseline(data);
 }
 
-void presentation_render_play_view(RenderView *view, RenderData *data, const GameState *game, RenderStatus status) {
+void presentation_render_play_view(RenderView *view, RenderData *data, const GameState *game, RenderStatus status,
+								   const PlayPresentationState *presentation_state) {
 	const int unit_size = board_unit_size(game->config);
 	const int plant_padding = unit_size / 8 > 0 ? unit_size / 8 : 1;
 	const int zombie_size = 8;
-	const int projectile_size = unit_size / 5 > 0 ? unit_size / 5 : 1;
+	const int projectile_size = physical_mode_enabled(presentation_state)
+									? (unit_size / 4 > 1 ? unit_size / 4 : 2)
+									: (unit_size / 5 > 0 ? unit_size / 5 : 1);
 	const int sun_size = unit_size / 3 > 0 ? unit_size / 3 : 1;
 	char previous_text[24];
 	char current_text[24];
@@ -822,7 +897,7 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 	old_wave_fill = wave_fill_width(view, &data->prev_frame);
 	new_wave_fill = wave_fill_width(view, &data->frame);
 
-	draw_play_board_full(view, game, plant_padding, zombie_size, projectile_size, sun_size);
+	draw_play_board_full(view, game, presentation_state, plant_padding, zombie_size, projectile_size, sun_size);
 	// Board dirty tracking is intentionally disabled; the entire board is refreshed as one region.
 	mark_full_target_dirty(view, RENDER_TARGET_BOARD);
 

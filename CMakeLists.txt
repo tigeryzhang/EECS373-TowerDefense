@@ -38,6 +38,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 set(APP_SOURCES
+    Core/Src/pvz_frontend.c
 )
 
 set(PVZ_SOURCES

@@ -2,6 +2,8 @@ file(REMOVE_RECURSE
   "pvz-with-hud.map"
   "CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.o"
   "CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.o.d"
+  "CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.o"
+  "CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.o.d"
   "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o"
   "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_hal_msp.c.o.d"
   "CMakeFiles/pvz-with-hud.dir/Core/Src/stm32l4xx_it.c.o"

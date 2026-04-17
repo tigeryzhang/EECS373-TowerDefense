@@ -156,6 +156,19 @@ tft_display/fast:
 .PHONY : tft_display/fast
 
 #=============================================================================
+# Target rules for targets named hub75_display
+
+# Build rule for target.
+hub75_display: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 hub75_display
+.PHONY : hub75_display
+
+# fast build rule for target.
+hub75_display/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hub75_display.dir/build.make CMakeFiles/hub75_display.dir/build
+.PHONY : hub75_display/fast
+
+#=============================================================================
 # Target rules for targets named STM32_Drivers
 
 # Build rule for target.
@@ -191,6 +204,30 @@ Core/Src/main.s: Core/Src/main.c.s
 Core/Src/main.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/main.c.s
 .PHONY : Core/Src/main.c.s
+
+Core/Src/pvz_frontend.o: Core/Src/pvz_frontend.c.o
+.PHONY : Core/Src/pvz_frontend.o
+
+# target to build an object file
+Core/Src/pvz_frontend.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.o
+.PHONY : Core/Src/pvz_frontend.c.o
+
+Core/Src/pvz_frontend.i: Core/Src/pvz_frontend.c.i
+.PHONY : Core/Src/pvz_frontend.i
+
+# target to preprocess a source file
+Core/Src/pvz_frontend.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.i
+.PHONY : Core/Src/pvz_frontend.c.i
+
+Core/Src/pvz_frontend.s: Core/Src/pvz_frontend.c.s
+.PHONY : Core/Src/pvz_frontend.s
+
+# target to generate assembly for a file
+Core/Src/pvz_frontend.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.s
+.PHONY : Core/Src/pvz_frontend.c.s
 
 Core/Src/stm32l4xx_hal_msp.o: Core/Src/stm32l4xx_hal_msp.c.o
 .PHONY : Core/Src/stm32l4xx_hal_msp.o
@@ -287,6 +324,30 @@ Core/Src/sysmem.s: Core/Src/sysmem.c.s
 Core/Src/sysmem.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/sysmem.c.s
 .PHONY : Core/Src/sysmem.c.s
+
+libs/hub75_display/hub75.o: libs/hub75_display/hub75.c.o
+.PHONY : libs/hub75_display/hub75.o
+
+# target to build an object file
+libs/hub75_display/hub75.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hub75_display.dir/build.make CMakeFiles/hub75_display.dir/libs/hub75_display/hub75.c.o
+.PHONY : libs/hub75_display/hub75.c.o
+
+libs/hub75_display/hub75.i: libs/hub75_display/hub75.c.i
+.PHONY : libs/hub75_display/hub75.i
+
+# target to preprocess a source file
+libs/hub75_display/hub75.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hub75_display.dir/build.make CMakeFiles/hub75_display.dir/libs/hub75_display/hub75.c.i
+.PHONY : libs/hub75_display/hub75.c.i
+
+libs/hub75_display/hub75.s: libs/hub75_display/hub75.c.s
+.PHONY : libs/hub75_display/hub75.s
+
+# target to generate assembly for a file
+libs/hub75_display/hub75.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hub75_display.dir/build.make CMakeFiles/hub75_display.dir/libs/hub75_display/hub75.c.s
+.PHONY : libs/hub75_display/hub75.c.s
 
 libs/pvz/src/app.o: libs/pvz/src/app.c.o
 .PHONY : libs/pvz/src/app.o
@@ -593,12 +654,16 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... STM32_Drivers"
+	@echo "... hub75_display"
 	@echo "... pvz"
 	@echo "... pvz-with-hud"
 	@echo "... tft_display"
 	@echo "... Core/Src/main.o"
 	@echo "... Core/Src/main.i"
 	@echo "... Core/Src/main.s"
+	@echo "... Core/Src/pvz_frontend.o"
+	@echo "... Core/Src/pvz_frontend.i"
+	@echo "... Core/Src/pvz_frontend.s"
 	@echo "... Core/Src/stm32l4xx_hal_msp.o"
 	@echo "... Core/Src/stm32l4xx_hal_msp.i"
 	@echo "... Core/Src/stm32l4xx_hal_msp.s"
@@ -611,6 +676,9 @@ help:
 	@echo "... Core/Src/sysmem.o"
 	@echo "... Core/Src/sysmem.i"
 	@echo "... Core/Src/sysmem.s"
+	@echo "... libs/hub75_display/hub75.o"
+	@echo "... libs/hub75_display/hub75.i"
+	@echo "... libs/hub75_display/hub75.s"
 	@echo "... libs/pvz/src/app.o"
 	@echo "... libs/pvz/src/app.i"
 	@echo "... libs/pvz/src/app.s"
