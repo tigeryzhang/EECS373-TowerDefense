@@ -35,9 +35,9 @@ GameConfig pvz_make_default_config(void) {
 		.sun_despawn_delay = 8.0f,
 		.peashooter_fire_interval = 1.0f,
 		.pea_speed_cells_per_second = 3.4f,
-		.zombie_speed_regular = 0.22f,
-		.zombie_speed_cone = 0.20f,
-		.zombie_speed_bucket = 0.17f,
+		.zombie_speed_regular = 0.15f,
+		.zombie_speed_cone = 0.14f,
+		.zombie_speed_bucket = 0.12f,
 	};
 	return config;
 }

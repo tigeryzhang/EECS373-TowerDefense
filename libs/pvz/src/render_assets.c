@@ -7,6 +7,7 @@
 #define T SPRITE_PIXEL_TRANSPARENT
 #define X RENDER_PALETTE_TEXT
 #define K RENDER_PALETTE_BUCKET
+#define O RENDER_PALETTE_CONE
 #define N RENDER_PALETTE_SUN
 #define L RENDER_PALETTE_WALLNUT
 #define P RENDER_PALETTE_PLANT
@@ -68,10 +69,10 @@ static const uint8_t zombie_bucket_armored_pixels[8 * 8] = {
 
 static const uint8_t plant_sunflower_pixels[8 * 8] = {
 	T, T, T, N, T, N, T, T,
-	N, T, N, G, N, G, N, T,
-	T, N, L, L, L, L, G, N,
-	N, G, L, X, X, L, G, N,
-	T, N, G, L, L, G, N, T,
+	N, T, N, O, N, O, N, T,
+	T, N, L, L, L, L, O, N,
+	N, O, L, X, X, L, O, N,
+	T, N, O, L, L, O, N, T,
 	T, T, N, P, P, N, T, N,
 	T, P, T, P, T, P, T, T,
 	T, T, P, P, P, T, T, T,

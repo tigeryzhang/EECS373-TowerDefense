@@ -14,11 +14,32 @@
 #define PVZ_SUN_POP_DAMPING 2.3f
 #define PVZ_GRAVITY 3.0f
 
+// static const PvzSpawnGroup level_0_wave_0_groups[] = {
+// 	{.type = ZOMBIE_REGULAR,
+// 	 .count = 3,
+// 	 .first_spawn_delay_sec = 0.0f,
+// 	 .spawn_interval_sec = 1.8f,
+// 	 .lane = PVZ_LANE_AUTO,
+// 	 .lane_mask = PVZ_LANE_MASK_ALL},
+// };
+
 static const PvzSpawnGroup level_0_wave_0_groups[] = {
 	{.type = ZOMBIE_REGULAR,
-	 .count = 3,
+	 .count = 1,
 	 .first_spawn_delay_sec = 0.0f,
-	 .spawn_interval_sec = 1.8f,
+	 .spawn_interval_sec = 1.4f,
+	 .lane = PVZ_LANE_AUTO,
+	 .lane_mask = PVZ_LANE_MASK_ALL},
+	{.type = ZOMBIE_CONE,
+	 .count = 1,
+	 .first_spawn_delay_sec = 0.0f,
+	 .spawn_interval_sec = 2.0f,
+	 .lane = PVZ_LANE_AUTO,
+	 .lane_mask = PVZ_LANE_MASK_ALL},
+	{.type = ZOMBIE_BUCKETHEAD,
+	 .count = 1,
+	 .first_spawn_delay_sec = 0.0f,
+	 .spawn_interval_sec = 2.0f,
 	 .lane = PVZ_LANE_AUTO,
 	 .lane_mask = PVZ_LANE_MASK_ALL},
 };
@@ -61,7 +82,8 @@ static const PvzSpawnGroup level_0_wave_2_groups[] = {
 
 static const PvzWaveDef level_0_waves[] = {
 	{.groups = level_0_wave_0_groups,
-	 .group_count = 1,
+	//  .group_count = 1,
+	 .group_count = 3,
 	 .start_delay_sec = 0.0f,
 	 .drain_threshold = 0,
 	 .flags = PVZ_WAVE_FLAG_NONE,
@@ -569,7 +591,7 @@ static void spawn_sun(GameState *state, BoardCoord coord) {
 	sun->y = (float)coord.row + 0.5f;
 	sun->x_vel = (horizontal_random * 2.0f - 1.0f) * PVZ_SUN_POP_SIDE_SPEED_MAX;
 	sun->y_vel = -(PVZ_SUN_POP_VERTICAL_SPEED_MIN +
-				(PVZ_SUN_POP_VERTICAL_SPEED_MAX - PVZ_SUN_POP_VERTICAL_SPEED_MIN) * vertical_random);
+				   (PVZ_SUN_POP_VERTICAL_SPEED_MAX - PVZ_SUN_POP_VERTICAL_SPEED_MIN) * vertical_random);
 	sun->target_y = sun->y + 0.3f * (get_random() * 2.0f - 1.0f);
 	sun->value = 25;
 	sun->despawn_timer = state->config->sun_despawn_delay;
@@ -947,7 +969,7 @@ bool game_coord_in_bounds(const GameState *state, BoardCoord coord) {
 void game_init(GameState *state, const GameConfig *config) {
 	memset(state, 0, sizeof(*state));
 	state->config = config;
-	state->wave_runtime.level_index = 2;
+	state->wave_runtime.level_index = 0;
 	game_reset(state);
 }
 
