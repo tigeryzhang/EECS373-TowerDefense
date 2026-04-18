@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpvz.a CMakeFiles/pvz.dir/libs/pvz/src/app.c.o CMakeFiles/pvz.dir/libs/pvz/src/game.c.o CMakeFiles/pvz.dir/libs/pvz/src/game_types.c.o CMakeFiles/pvz.dir/libs/pvz/src/input.c.o CMakeFiles/pvz.dir/libs/pvz/src/placeholder_scene.c.o CMakeFiles/pvz.dir/libs/pvz/src/play_scene.c.o CMakeFiles/pvz.dir/libs/pvz/src/presentation.c.o CMakeFiles/pvz.dir/libs/pvz/src/pvz_config.c.o CMakeFiles/pvz.dir/libs/pvz/src/pvz_rect.c.o CMakeFiles/pvz.dir/libs/pvz/src/pvz_utils.c.o CMakeFiles/pvz.dir/libs/pvz/src/render_assets.c.o
-/usr/bin/ranlib libpvz.a

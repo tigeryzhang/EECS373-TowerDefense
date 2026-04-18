@@ -1,2 +1,0 @@
-/usr/bin/ar qc libhub75_display.a CMakeFiles/hub75_display.dir/libs/hub75_display/hub75.c.o
-/usr/bin/ranlib libhub75_display.a

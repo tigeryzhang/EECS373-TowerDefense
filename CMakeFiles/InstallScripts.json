@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake_install.cmake",
-		"/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
