@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app.h"
+#include "frame_pacing.h"
 #include "hub75.h"
 #include "input.h"
 #include "presentation.h"
@@ -141,27 +142,27 @@ static bool frame_deadline_reached_us(uint32_t now_us, uint32_t deadline_us) {
 	return (int32_t)(now_us - deadline_us) >= 0;
 }
 
-static uint32_t fixed_dt_to_frame_us(float fixed_dt) {
-	if (fixed_dt <= 0.0f) {
-		fixed_dt = PVZ_DEFAULT_FIXED_DT;
-	}
-
-	return (uint32_t)(fixed_dt * 1000000.0f + 0.5f);
-}
-
-static float frame_dt_from_elapsed_us(uint32_t elapsed_us, float fallback_dt) {
-	const float frame_dt = (float)elapsed_us / 1000000.0f;
-
-	if (frame_dt <= 0.0f || frame_dt > (fallback_dt * 4.0f)) {
-		return fallback_dt;
-	}
-
-	return frame_dt;
-}
-
 static void busy_wait_us(uint32_t duration_us) {
 	const uint32_t start_us = frame_timer_now_us();
 	while (frame_timer_elapsed_us(start_us, frame_timer_now_us()) < duration_us) {
+		__NOP();
+	}
+}
+
+static void wait_for_frame_deadline_ms(uint32_t deadline_ms) {
+	while (1) {
+		const uint32_t now_ms = HAL_GetTick();
+		const int32_t remaining_ms = (int32_t)(deadline_ms - now_ms);
+
+		if (remaining_ms <= 0) {
+			return;
+		}
+
+		if (remaining_ms > 1) {
+			HAL_Delay((uint32_t)(remaining_ms - 1));
+			continue;
+		}
+
 		__NOP();
 	}
 }
@@ -339,22 +340,25 @@ int main(void) {
 	tof_sensor_init(&tof_sensor);
 	tof_next_measurement_us = frame_timer_now_us();
 
-	uint32_t previous_frame_start_us = frame_timer_now_us() - fixed_dt_to_frame_us(app.config.fixed_dt);
+	const uint32_t target_frame_ms = frame_pacing_target_frame_ms(app.config.fixed_dt);
+	uint32_t previous_frame_start_ms = HAL_GetTick() - target_frame_ms;
+	uint32_t next_frame_deadline_ms = HAL_GetTick() + target_frame_ms;
 
 	volatile uint32_t work_duration_us;
+	(void)work_duration_us;
 	while (1) {
-		const uint32_t target_frame_us = fixed_dt_to_frame_us(app.config.fixed_dt);
+		const uint32_t frame_start_ms = HAL_GetTick();
 		const uint32_t frame_start_us = frame_timer_now_us();
-		const float frame_dt = frame_dt_from_elapsed_us(frame_timer_elapsed_us(previous_frame_start_us, frame_start_us),
-														app.config.fixed_dt);
-		previous_frame_start_us = frame_start_us;
+		const float frame_dt =
+			frame_pacing_frame_dt_from_elapsed_ms(frame_start_ms - previous_frame_start_ms, app.config.fixed_dt);
+		previous_frame_start_ms = frame_start_ms;
 
 		InputFrame input;
 		input_frame_reset(&input);
 		tof_poll_sensor(frame_start_us);
 		(void)pvz_uart_rx_read_latest(&frontend_snapshot, NULL);
 		frontend_snapshot.hand_present = tof_sensor_hand_present(&tof_sensor);
-		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_us / 1000u);
+		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_ms);
 		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
 		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
 
@@ -380,12 +384,11 @@ int main(void) {
 		// Calculate how long your game logic actually took, accounting for overflow
 		work_duration_us = frame_timer_elapsed_us(frame_start_us, work_end_us);
 		// NOTE: 'work_duration_us' is the active CPU time.
-		// If this number is frequently larger than target_frame_us, the code
+		// If this number is frequently larger than target_frame_ms * 1000, the code
 		// is too slow to maintain the requested frame rate.
-
-		while (frame_timer_elapsed_us(frame_start_us, frame_timer_now_us()) < target_frame_us) {
-			__NOP();
-		}
+		wait_for_frame_deadline_ms(next_frame_deadline_ms);
+		next_frame_deadline_ms =
+			frame_pacing_next_deadline_ms(next_frame_deadline_ms, target_frame_ms, HAL_GetTick());
 	}
 	/* USER CODE END 3 */
 }

@@ -38,6 +38,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 set(APP_SOURCES
+    Core/Src/frame_pacing.c
     Core/Src/pvz_frontend.c
     Core/Src/pvz_uart_protocol.c
     Core/Src/pvz_uart_rx.c
