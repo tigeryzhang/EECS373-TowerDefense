@@ -386,12 +386,8 @@ int main(void) {
 		/* USER CODE BEGIN 3 */
 		// Measure actual work time (Profiling)
 		const uint32_t work_end_us = frame_timer_now_us();
-
-		// Calculate how long your game logic actually took, accounting for overflow
 		work_duration_us = frame_timer_elapsed_us(frame_start_us, work_end_us);
-		// NOTE: 'work_duration_us' is the active CPU time.
-		// If this number is frequently larger than target_frame_ms * 1000, the code
-		// is too slow to maintain the requested frame rate.
+
 		wait_for_frame_deadline_ms(next_frame_deadline_ms);
 		next_frame_deadline_ms = frame_pacing_next_deadline_ms(next_frame_deadline_ms, target_frame_ms, HAL_GetTick());
 	}
