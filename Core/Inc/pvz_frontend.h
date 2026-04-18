@@ -47,7 +47,8 @@ typedef struct {
 void pvz_frontend_init(PvzFrontendState *state, const GameConfig *config);
 void pvz_frontend_fill_stub_snapshot(PvzFrontendSnapshot *snapshot, const GameConfig *config);
 void pvz_frontend_fill_scripted_stub_snapshot(PvzFrontendSnapshot *snapshot, const GameConfig *config, uint32_t now_ms);
-void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnapshot *snapshot, uint32_t now_ms);
+void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnapshot *snapshot, uint32_t now_ms,
+								  bool snapshot_is_new);
 void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, InputFrame *input, bool play_scene_active);
 void pvz_frontend_post_update(PvzFrontendState *state, const GameState *previous, const GameState *current, float frame_dt,
 							  bool play_scene_active);

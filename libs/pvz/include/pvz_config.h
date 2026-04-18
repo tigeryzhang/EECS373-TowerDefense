@@ -68,7 +68,7 @@ typedef struct {
 	float zombie_spawn_interval;
 	float zombie_attack_interval;
 	float sunflower_sun_interval;
-	float sunflower_collect_delay;
+	float sun_despawn_delay;
 	float peashooter_fire_interval;
 
 	// Movement

@@ -8,6 +8,6 @@
 #include <stdint.h>
 
 bool pvz_uart_rx_init(UART_HandleTypeDef *huart, const GameConfig *config);
-bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms);
+bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms, uint32_t *snapshot_generation);
 
 #endif

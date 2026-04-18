@@ -11,7 +11,7 @@ enum {
 	TOF_HAND_CLEAR_SAMPLES = 2,
 };
 
-static const float TOF_HAND_DISTANCE_IN = 6.0f;
+static const float TOF_HAND_DISTANCE_IN = 10.0f;
 
 static uint32_t elapsed_us(uint32_t start_us, uint32_t end_us) { return end_us - start_us; }
 
