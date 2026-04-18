@@ -229,6 +229,54 @@ Core/Src/pvz_frontend.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_frontend.c.s
 .PHONY : Core/Src/pvz_frontend.c.s
 
+Core/Src/pvz_uart_protocol.o: Core/Src/pvz_uart_protocol.c.o
+.PHONY : Core/Src/pvz_uart_protocol.o
+
+# target to build an object file
+Core/Src/pvz_uart_protocol.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_protocol.c.o
+.PHONY : Core/Src/pvz_uart_protocol.c.o
+
+Core/Src/pvz_uart_protocol.i: Core/Src/pvz_uart_protocol.c.i
+.PHONY : Core/Src/pvz_uart_protocol.i
+
+# target to preprocess a source file
+Core/Src/pvz_uart_protocol.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_protocol.c.i
+.PHONY : Core/Src/pvz_uart_protocol.c.i
+
+Core/Src/pvz_uart_protocol.s: Core/Src/pvz_uart_protocol.c.s
+.PHONY : Core/Src/pvz_uart_protocol.s
+
+# target to generate assembly for a file
+Core/Src/pvz_uart_protocol.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_protocol.c.s
+.PHONY : Core/Src/pvz_uart_protocol.c.s
+
+Core/Src/pvz_uart_rx.o: Core/Src/pvz_uart_rx.c.o
+.PHONY : Core/Src/pvz_uart_rx.o
+
+# target to build an object file
+Core/Src/pvz_uart_rx.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_rx.c.o
+.PHONY : Core/Src/pvz_uart_rx.c.o
+
+Core/Src/pvz_uart_rx.i: Core/Src/pvz_uart_rx.c.i
+.PHONY : Core/Src/pvz_uart_rx.i
+
+# target to preprocess a source file
+Core/Src/pvz_uart_rx.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_rx.c.i
+.PHONY : Core/Src/pvz_uart_rx.c.i
+
+Core/Src/pvz_uart_rx.s: Core/Src/pvz_uart_rx.c.s
+.PHONY : Core/Src/pvz_uart_rx.s
+
+# target to generate assembly for a file
+Core/Src/pvz_uart_rx.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvz-with-hud.dir/build.make CMakeFiles/pvz-with-hud.dir/Core/Src/pvz_uart_rx.c.s
+.PHONY : Core/Src/pvz_uart_rx.c.s
+
 Core/Src/stm32l4xx_hal_msp.o: Core/Src/stm32l4xx_hal_msp.c.o
 .PHONY : Core/Src/stm32l4xx_hal_msp.o
 
@@ -664,6 +712,12 @@ help:
 	@echo "... Core/Src/pvz_frontend.o"
 	@echo "... Core/Src/pvz_frontend.i"
 	@echo "... Core/Src/pvz_frontend.s"
+	@echo "... Core/Src/pvz_uart_protocol.o"
+	@echo "... Core/Src/pvz_uart_protocol.i"
+	@echo "... Core/Src/pvz_uart_protocol.s"
+	@echo "... Core/Src/pvz_uart_rx.o"
+	@echo "... Core/Src/pvz_uart_rx.i"
+	@echo "... Core/Src/pvz_uart_rx.s"
 	@echo "... Core/Src/stm32l4xx_hal_msp.o"
 	@echo "... Core/Src/stm32l4xx_hal_msp.i"
 	@echo "... Core/Src/stm32l4xx_hal_msp.s"
