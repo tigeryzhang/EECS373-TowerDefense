@@ -14,6 +14,7 @@ typedef struct {
 	uint8_t rx_buffer[PVZ_UART_RX_BUFFER_SIZE];
 	PvzFrontendSnapshot snapshots[2];
 	volatile uint8_t published_index;
+	volatile uint32_t published_generation;
 	volatile uint32_t last_snapshot_ms;
 	volatile bool has_snapshot;
 } PvzUartRxState;
@@ -48,6 +49,7 @@ static void publish_snapshot(const PvzFrontendSnapshot *snapshot) {
 	g_pvz_uart_rx.snapshots[next_index] = *snapshot;
 	__DMB();
 	g_pvz_uart_rx.last_snapshot_ms = HAL_GetTick();
+	g_pvz_uart_rx.published_generation++;
 	g_pvz_uart_rx.published_index = next_index;
 	g_pvz_uart_rx.has_snapshot = true;
 }
@@ -75,7 +77,7 @@ bool pvz_uart_rx_init(UART_HandleTypeDef *huart, const GameConfig *config) {
 	return start_receive();
 }
 
-bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms) {
+bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms, uint32_t *snapshot_generation) {
 	uint32_t primask;
 
 	if (out_snapshot == NULL) {
@@ -93,6 +95,9 @@ bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms
 	*out_snapshot = g_pvz_uart_rx.snapshots[g_pvz_uart_rx.published_index];
 	if (age_ms != NULL) {
 		*age_ms = HAL_GetTick() - g_pvz_uart_rx.last_snapshot_ms;
+	}
+	if (snapshot_generation != NULL) {
+		*snapshot_generation = g_pvz_uart_rx.published_generation;
 	}
 
 	restore_irq_state(primask);

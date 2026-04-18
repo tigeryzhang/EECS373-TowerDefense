@@ -316,8 +316,9 @@ int main(void) {
 	pvz_frontend_init(&pvz_frontend, &app.config);
 
 	PvzFrontendSnapshot frontend_snapshot = {0};
+	uint32_t frontend_snapshot_generation = 0u;
 	(void)pvz_uart_rx_init(&hlpuart1, &app.config);
-	pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, 0);
+	pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, 0, false);
 	pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
 
 	render_view_init(&render_view, config.board_x_resolution, config.board_y_resolution, config.hud_x_resolution,
@@ -356,9 +357,14 @@ int main(void) {
 		InputFrame input;
 		input_frame_reset(&input);
 		tof_poll_sensor(frame_start_us);
-		(void)pvz_uart_rx_read_latest(&frontend_snapshot, NULL);
+		uint32_t latest_snapshot_generation = frontend_snapshot_generation;
+		const bool have_uart_snapshot = pvz_uart_rx_read_latest(&frontend_snapshot, NULL, &latest_snapshot_generation);
+		const bool snapshot_is_new = have_uart_snapshot && latest_snapshot_generation != frontend_snapshot_generation;
+		if (snapshot_is_new) {
+			frontend_snapshot_generation = latest_snapshot_generation;
+		}
 		frontend_snapshot.hand_present = tof_sensor_hand_present(&tof_sensor);
-		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_ms);
+		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_ms, snapshot_is_new);
 		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
 		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
 
@@ -387,8 +393,7 @@ int main(void) {
 		// If this number is frequently larger than target_frame_ms * 1000, the code
 		// is too slow to maintain the requested frame rate.
 		wait_for_frame_deadline_ms(next_frame_deadline_ms);
-		next_frame_deadline_ms =
-			frame_pacing_next_deadline_ms(next_frame_deadline_ms, target_frame_ms, HAL_GetTick());
+		next_frame_deadline_ms = frame_pacing_next_deadline_ms(next_frame_deadline_ms, target_frame_ms, HAL_GetTick());
 	}
 	/* USER CODE END 3 */
 }

@@ -3,8 +3,8 @@
 #include <string.h>
 
 enum {
-	// CV must agree for this many frames before a tile change is trusted.
-	PVZ_FRONTEND_DEBOUNCE_FRAMES = 3,
+	// CV must agree across this many distinct UART snapshots before a tile change is trusted.
+	PVZ_FRONTEND_DEBOUNCE_SNAPSHOTS = 2,
 	// After a hand is seen, ignore CV updates for a short grace window.
 	PVZ_FRONTEND_HAND_GRACE_MS = 1000,
 };
@@ -311,8 +311,9 @@ void pvz_frontend_fill_scripted_stub_snapshot(PvzFrontendSnapshot *snapshot, con
 	// 13.5s - 16.0s: clear the board before the script loops.
 }
 
-// Ingests the latest observed board, applying hand suppression and tile debounce.
-void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnapshot *snapshot, uint32_t now_ms) {
+// Ingests the latest observed board, applying hand suppression and snapshot-based tile debounce.
+void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnapshot *snapshot, uint32_t now_ms,
+								  bool snapshot_is_new) {
 	if (!state || !state->config || !snapshot) {
 		return;
 	}
@@ -329,16 +330,30 @@ void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnap
 	}
 	state->sync_blocked = snapshot->hand_present || deadline_is_in_future(now_ms, state->sync_blocked_until_ms);
 
+	if (state->sync_blocked) {
+		for (int row = 0; row < state->config->rows; ++row) {
+			for (int col = 0; col < state->config->cols; ++col) {
+				if (snapshot_is_new) {
+					const PlantType observed = normalize_piece_type(snapshot->observed_piece[row][col]);
+					state->raw_snapshot.observed_piece[row][col] = observed;
+					state->debounce_candidate[row][col] = observed;
+				}
+				state->debounce_count[row][col] = 0;
+			}
+		}
+		refresh_tile_latches(state);
+		return;
+	}
+
+	if (!snapshot_is_new) {
+		refresh_tile_latches(state);
+		return;
+	}
+
 	for (int row = 0; row < state->config->rows; ++row) {
 		for (int col = 0; col < state->config->cols; ++col) {
 			const PlantType observed = normalize_piece_type(snapshot->observed_piece[row][col]);
 			state->raw_snapshot.observed_piece[row][col] = observed;
-
-			if (state->sync_blocked) {
-				state->debounce_candidate[row][col] = observed;
-				state->debounce_count[row][col] = 0;
-				continue;
-			}
 
 			if (state->debounce_candidate[row][col] != observed) {
 				state->debounce_candidate[row][col] = observed;
@@ -348,7 +363,7 @@ void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnap
 			}
 
 			if (state->stable_board[row][col] != observed &&
-				state->debounce_count[row][col] >= PVZ_FRONTEND_DEBOUNCE_FRAMES) {
+				state->debounce_count[row][col] >= PVZ_FRONTEND_DEBOUNCE_SNAPSHOTS) {
 				state->stable_board[row][col] = observed;
 			}
 		}
