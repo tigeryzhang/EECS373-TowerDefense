@@ -65,6 +65,10 @@ set(HUB75_DISPLAY_SOURCES
     libs/hub75_display/hub75.c
 )
 
+set(TOF_SOURCES
+    libs/tof/src/tof_sensor.c
+)
+
 add_library(pvz STATIC)
 target_sources(pvz PRIVATE ${PVZ_SOURCES})
 target_include_directories(pvz PUBLIC
@@ -86,6 +90,12 @@ target_include_directories(hub75_display PUBLIC
 )
 target_link_libraries(hub75_display PUBLIC stm32cubemx)
 
+add_library(tof STATIC)
+target_sources(tof PRIVATE ${TOF_SOURCES})
+target_include_directories(tof PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/tof/include
+)
+
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${APP_SOURCES})
 
 # Remove wrong libob.a library dependency when using cpp files
@@ -97,4 +107,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     pvz
     tft_display
     hub75_display
+    tof
 )

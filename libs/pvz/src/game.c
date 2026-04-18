@@ -1057,6 +1057,20 @@ GameCommandResult game_apply_command(GameState *state, GameCommand command) {
 		remove_plant(state, state->plant_grid[command.coord.row][command.coord.col]);
 		result = GAME_COMMAND_RESULT_OK;
 		break;
+	case GAME_COMMAND_COLLECT_SUN: {
+		bool collected_any = false;
+		for (int i = 0; i < PVZ_MAX_SUNS; ++i) {
+			if (!state->suns[i].active) {
+				continue;
+			}
+
+			state->sun_count += state->suns[i].value;
+			state->suns[i].active = false;
+			collected_any = true;
+		}
+		result = collected_any ? GAME_COMMAND_RESULT_OK : GAME_COMMAND_RESULT_IGNORED;
+		break;
+	}
 	case GAME_COMMAND_TOGGLE_PAUSE:
 		if (state->status == GAME_STATUS_RUNNING) {
 			state->paused = !state->paused;

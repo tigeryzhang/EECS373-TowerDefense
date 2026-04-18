@@ -9,7 +9,7 @@ enum {
 };
 
 typedef struct {
-	UART_HandleTypeDef *huart;
+	UART_HandleTypeDef *uart_handle;
 	const GameConfig *config;
 	uint8_t rx_buffer[PVZ_UART_RX_BUFFER_SIZE];
 	PvzFrontendSnapshot snapshots[2];
@@ -27,16 +27,16 @@ static void restore_irq_state(uint32_t primask) {
 }
 
 static bool start_receive(void) {
-	if (g_pvz_uart_rx.huart == NULL) {
+	if (g_pvz_uart_rx.uart_handle == NULL) {
 		return false;
 	}
-	if (HAL_UARTEx_ReceiveToIdle_DMA(g_pvz_uart_rx.huart, g_pvz_uart_rx.rx_buffer, sizeof(g_pvz_uart_rx.rx_buffer)) !=
+	if (HAL_UARTEx_ReceiveToIdle_DMA(g_pvz_uart_rx.uart_handle, g_pvz_uart_rx.rx_buffer, sizeof(g_pvz_uart_rx.rx_buffer)) !=
 		HAL_OK) {
 		return false;
 	}
 
-	if (g_pvz_uart_rx.huart->hdmarx != NULL) {
-		__HAL_DMA_DISABLE_IT(g_pvz_uart_rx.huart->hdmarx, DMA_IT_HT);
+	if (g_pvz_uart_rx.uart_handle->hdmarx != NULL) {
+		__HAL_DMA_DISABLE_IT(g_pvz_uart_rx.uart_handle->hdmarx, DMA_IT_HT);
 	}
 
 	return true;
@@ -55,7 +55,7 @@ static void publish_snapshot(const PvzFrontendSnapshot *snapshot) {
 static void handle_rx_event(UART_HandleTypeDef *huart, uint16_t size) {
 	PvzFrontendSnapshot snapshot;
 
-	if (huart != g_pvz_uart_rx.huart || g_pvz_uart_rx.config == NULL) {
+	if (huart != g_pvz_uart_rx.uart_handle || g_pvz_uart_rx.config == NULL) {
 		return;
 	}
 
@@ -69,7 +69,7 @@ static void handle_rx_event(UART_HandleTypeDef *huart, uint16_t size) {
 
 bool pvz_uart_rx_init(UART_HandleTypeDef *huart, const GameConfig *config) {
 	memset(&g_pvz_uart_rx, 0, sizeof(g_pvz_uart_rx));
-	g_pvz_uart_rx.huart = huart;
+	g_pvz_uart_rx.uart_handle = huart;
 	g_pvz_uart_rx.config = config;
 
 	return start_receive();
@@ -102,7 +102,7 @@ bool pvz_uart_rx_read_latest(PvzFrontendSnapshot *out_snapshot, uint32_t *age_ms
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) { handle_rx_event(huart, Size); }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-	if (huart != g_pvz_uart_rx.huart) {
+	if (huart != g_pvz_uart_rx.uart_handle) {
 		return;
 	}
 

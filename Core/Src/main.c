@@ -29,6 +29,7 @@
 
 #include "ili9488.h"
 #include "stm32l4xx_hal.h"
+#include "tof_sensor.h"
 
 #include <stdbool.h>
 
@@ -55,7 +56,6 @@
 ADC_HandleTypeDef hadc1;
 
 COMP_HandleTypeDef hcomp1;
-COMP_HandleTypeDef hcomp2;
 
 SMBUS_HandleTypeDef hsmbus1;
 SMBUS_HandleTypeDef hsmbus2;
@@ -99,7 +99,6 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_COMP1_Init(void);
-static void MX_COMP2_Init(void);
 static void MX_I2C1_SMBUS_Init(void);
 static void MX_I2C2_SMBUS_Init(void);
 static void MX_LPUART1_UART_Init(void);
@@ -122,17 +121,25 @@ static void MX_USB_OTG_FS_USB_Init(void);
 enum {
 	HUD_UPLOAD_BAND_HEIGHT = 12,
 	HUD_PALETTE_COUNT = RENDER_PALETTE_ART_8 + 1,
+	TOF_TRIGGER_PULSE_US = 15,
+	TOF_MEASUREMENT_PERIOD_US = 70000,
 };
 
 static uint8_t hud_upload_buffer[PVZ_MAX_HUD_WIDTH * HUD_UPLOAD_BAND_HEIGHT * 3];
 static uint8_t hud_palette_rgb666[256][3];
 static bool hud_palette_rgb666_initialized = false;
+static ToFSensor tof_sensor;
+static uint32_t tof_next_measurement_us = 0;
 
 static int min_int(int a, int b) { return a < b ? a : b; }
 
 static uint32_t frame_timer_now_us(void) { return __HAL_TIM_GET_COUNTER(&htim2); }
 
 static uint32_t frame_timer_elapsed_us(uint32_t start_us, uint32_t end_us) { return end_us - start_us; }
+
+static bool frame_deadline_reached_us(uint32_t now_us, uint32_t deadline_us) {
+	return (int32_t)(now_us - deadline_us) >= 0;
+}
 
 static uint32_t fixed_dt_to_frame_us(float fixed_dt) {
 	if (fixed_dt <= 0.0f) {
@@ -150,6 +157,13 @@ static float frame_dt_from_elapsed_us(uint32_t elapsed_us, float fallback_dt) {
 	}
 
 	return frame_dt;
+}
+
+static void busy_wait_us(uint32_t duration_us) {
+	const uint32_t start_us = frame_timer_now_us();
+	while (frame_timer_elapsed_us(start_us, frame_timer_now_us()) < duration_us) {
+		__NOP();
+	}
 }
 
 static void rgb565_to_rgb666_bytes(uint16_t color, uint8_t rgb[3]) {
@@ -173,6 +187,17 @@ static void init_hud_palette_rgb666(void) {
 static void init_hub75_palette(void) {
 	for (int palette = 0; palette < HUD_PALETTE_COUNT; ++palette) {
 		hub75_set_palette_rgb565((uint8_t)palette, presentation_palette_to_rgb565((RenderPalette)palette));
+	}
+}
+
+static void tof_poll_sensor(uint32_t now_us) {
+	tof_sensor_update(&tof_sensor, now_us);
+
+	if (frame_deadline_reached_us(now_us, tof_next_measurement_us)) {
+		HAL_GPIO_WritePin(TOF_TRIGGER_GPIO_Port, TOF_TRIGGER_Pin, GPIO_PIN_SET);
+		busy_wait_us(TOF_TRIGGER_PULSE_US);
+		HAL_GPIO_WritePin(TOF_TRIGGER_GPIO_Port, TOF_TRIGGER_Pin, GPIO_PIN_RESET);
+		tof_next_measurement_us = now_us + TOF_MEASUREMENT_PERIOD_US;
 	}
 }
 
@@ -223,6 +248,13 @@ static void upload_to_hud(const RenderView *view) {
 		}
 	}
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == TOF_ECHO_Pin) {
+		const bool level_high = HAL_GPIO_ReadPin(TOF_ECHO_GPIO_Port, TOF_ECHO_Pin) == GPIO_PIN_SET;
+		tof_sensor_handle_echo_edge(&tof_sensor, frame_timer_now_us(), level_high);
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -259,7 +291,6 @@ int main(void) {
 	MX_DMA_Init();
 	MX_ADC1_Init();
 	MX_COMP1_Init();
-	MX_COMP2_Init();
 	MX_I2C1_SMBUS_Init();
 	MX_I2C2_SMBUS_Init();
 	MX_LPUART1_UART_Init();
@@ -305,6 +336,8 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	HAL_TIM_Base_Start(&htim2);
 	__HAL_TIM_SET_COUNTER(&htim2, 0);
+	tof_sensor_init(&tof_sensor);
+	tof_next_measurement_us = frame_timer_now_us();
 
 	uint32_t previous_frame_start_us = frame_timer_now_us() - fixed_dt_to_frame_us(app.config.fixed_dt);
 
@@ -318,7 +351,9 @@ int main(void) {
 
 		InputFrame input;
 		input_frame_reset(&input);
+		tof_poll_sensor(frame_start_us);
 		(void)pvz_uart_rx_read_latest(&frontend_snapshot, NULL);
+		frontend_snapshot.hand_present = tof_sensor_hand_present(&tof_sensor);
 		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_us / 1000u);
 		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
 		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
@@ -520,37 +555,6 @@ static void MX_COMP1_Init(void) {
 	/* USER CODE BEGIN COMP1_Init 2 */
 
 	/* USER CODE END COMP1_Init 2 */
-}
-
-/**
- * @brief COMP2 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_COMP2_Init(void) {
-
-	/* USER CODE BEGIN COMP2_Init 0 */
-
-	/* USER CODE END COMP2_Init 0 */
-
-	/* USER CODE BEGIN COMP2_Init 1 */
-
-	/* USER CODE END COMP2_Init 1 */
-	hcomp2.Instance = COMP2;
-	hcomp2.Init.InvertingInput = COMP_INPUT_MINUS_IO2;
-	hcomp2.Init.NonInvertingInput = COMP_INPUT_PLUS_IO2;
-	hcomp2.Init.OutputPol = COMP_OUTPUTPOL_NONINVERTED;
-	hcomp2.Init.Hysteresis = COMP_HYSTERESIS_NONE;
-	hcomp2.Init.BlankingSrce = COMP_BLANKINGSRC_NONE;
-	hcomp2.Init.Mode = COMP_POWERMODE_HIGHSPEED;
-	hcomp2.Init.WindowMode = COMP_WINDOWMODE_DISABLE;
-	hcomp2.Init.TriggerMode = COMP_TRIGGERMODE_NONE;
-	if (HAL_COMP_Init(&hcomp2) != HAL_OK) {
-		Error_Handler();
-	}
-	/* USER CODE BEGIN COMP2_Init 2 */
-
-	/* USER CODE END COMP2_Init 2 */
 }
 
 /**
@@ -1197,6 +1201,9 @@ static void MX_GPIO_Init(void) {
 					  GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15,
 					  GPIO_PIN_RESET);
 
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(TOF_TRIGGER_GPIO_Port, TOF_TRIGGER_Pin, GPIO_PIN_RESET);
+
 	/*Configure GPIO pins : PA0 PA1 PA4 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -1262,6 +1269,12 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	/*Configure GPIO pin : TOF_ECHO_Pin */
+	GPIO_InitStruct.Pin = TOF_ECHO_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(TOF_ECHO_GPIO_Port, &GPIO_InitStruct);
+
 	/*Configure GPIO pin : PD0 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -1278,11 +1291,28 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Alternate = GPIO_AF12_SDMMC1;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
+	/*Configure GPIO pin : PB6 */
+	GPIO_InitStruct.Pin = GPIO_PIN_6;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : TOF_TRIGGER_Pin */
+	GPIO_InitStruct.Pin = TOF_TRIGGER_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(TOF_TRIGGER_GPIO_Port, &GPIO_InitStruct);
+
 	/*Configure GPIO pin : PE0 */
 	GPIO_InitStruct.Pin = GPIO_PIN_0;
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+	/* EXTI interrupt init*/
+	HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 	/* USER CODE BEGIN MX_GPIO_Init_2 */
 
