@@ -42,6 +42,7 @@ set(APP_SOURCES
     Core/Src/pvz_frontend.c
     Core/Src/pvz_uart_protocol.c
     Core/Src/pvz_uart_rx.c
+    Core/Src/pvz_rng.c
 )
 
 set(PVZ_SOURCES
@@ -74,6 +75,7 @@ add_library(pvz STATIC)
 target_sources(pvz PRIVATE ${PVZ_SOURCES})
 target_include_directories(pvz PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/libs/pvz/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
 )
 target_link_libraries(pvz PUBLIC m)
 

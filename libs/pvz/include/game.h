@@ -98,8 +98,11 @@ typedef struct {
 	bool active;
 	float x;
 	float y;
+	float x_vel;
+	float y_vel;
+	float target_y;
 	int value;
-	float collect_timer;
+	float despawn_timer;
 } Sun;
 
 // TODO: Add Lawnmowers

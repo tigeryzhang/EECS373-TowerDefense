@@ -310,7 +310,7 @@ int main(void) {
 	ILI9488_SetRotation(3);
 
 	GameConfig config = pvz_make_default_config();
-	config.start_with_demo_layout = false;
+	// config.start_with_demo_layout = true;
 
 	app_init(&app, &config);
 	pvz_frontend_init(&pvz_frontend, &app.config);

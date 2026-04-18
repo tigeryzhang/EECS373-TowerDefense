@@ -391,6 +391,8 @@ void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, In
 		return;
 	}
 
+	// return;
+
 	if (state->sync_blocked) {
 		return;
 	}

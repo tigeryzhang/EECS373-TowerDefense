@@ -1,12 +1,18 @@
 #include "game.h"
 #include "game_types.h"
 #include "pvz_config.h"
+#include "pvz_rng.h"
 #include "pvz_utils.h"
 
 #include <math.h>
 #include <string.h>
 
 #define PVZ_MAJOR_WAVE_WARNING_SEC 2.0f
+#define PVZ_SUN_POP_VERTICAL_SPEED_MIN 0.65f
+#define PVZ_SUN_POP_VERTICAL_SPEED_MAX 1.3f
+#define PVZ_SUN_POP_SIDE_SPEED_MAX 0.8f
+#define PVZ_SUN_POP_DAMPING 2.3f
+#define PVZ_GRAVITY 3.0f
 
 static const PvzSpawnGroup level_0_wave_0_groups[] = {
 	{.type = ZOMBIE_REGULAR,
@@ -538,17 +544,35 @@ static void spawn_projectile(GameState *state, int lane, float x) {
 	state->projectiles[slot].speed = state->config->pea_speed_cells_per_second;
 }
 
+static float clamp_random_01(float value) {
+	if (value < 0.0f) {
+		return 0.0f;
+	}
+	if (value > 1.0f) {
+		return 1.0f;
+	}
+	return value;
+}
+
 static void spawn_sun(GameState *state, BoardCoord coord) {
 	const int slot = get_free_sun_slot(state);
 	if (slot < 0) {
 		return;
 	}
 
-	state->suns[slot].active = true;
-	state->suns[slot].x = (float)coord.col + 0.5f;
-	state->suns[slot].y = (float)coord.row + 0.5f;
-	state->suns[slot].value = 25;
-	state->suns[slot].collect_timer = state->config->sunflower_collect_delay;
+	Sun *sun = &state->suns[slot];
+	const float horizontal_random = get_random();
+	const float vertical_random = get_random();
+
+	sun->active = true;
+	sun->x = (float)coord.col + 0.5f;
+	sun->y = (float)coord.row + 0.5f;
+	sun->x_vel = (horizontal_random * 2.0f - 1.0f) * PVZ_SUN_POP_SIDE_SPEED_MAX;
+	sun->y_vel = -(PVZ_SUN_POP_VERTICAL_SPEED_MIN +
+				(PVZ_SUN_POP_VERTICAL_SPEED_MAX - PVZ_SUN_POP_VERTICAL_SPEED_MIN) * vertical_random);
+	sun->target_y = sun->y + 0.3f * (get_random() * 2.0f - 1.0f);
+	sun->value = 25;
+	sun->despawn_timer = state->config->sun_despawn_delay;
 }
 
 static bool place_plant_internal(GameState *state, PlantType plant_type, BoardCoord coord, bool charge_cost) {
@@ -578,11 +602,13 @@ static void spawn_demo_plants(GameState *state) {
 		return;
 	}
 
-	BoardCoord sunflower = {0, 0};
-	BoardCoord peashooter = {state->config->rows > 1 ? 1 : 0, state->config->cols > 1 ? 1 : 0};
-	BoardCoord wallnut = {state->config->rows > 2 ? 2 : state->config->rows - 1,
-						  state->config->cols > 2 ? 2 : state->config->cols - 1};
-	place_plant_internal(state, PLANT_SUNFLOWER, sunflower, false);
+	BoardCoord peashooter = {1, 1};
+	BoardCoord wallnut = {2, 2};
+	for (int i = 0; i < state->config->rows; ++i) {
+		BoardCoord sunflower = {i, 0};
+		place_plant_internal(state, PLANT_SUNFLOWER, sunflower, false);
+	}
+
 	if (state->plant_grid[peashooter.row][peashooter.col] < 0) {
 		place_plant_internal(state, PLANT_PEASHOOTER, peashooter, false);
 	}
@@ -786,13 +812,27 @@ static void damage_zombie(Zombie *zombie, int damage) {
 
 static void step_suns(GameState *state, float dt) {
 	for (int i = 0; i < PVZ_MAX_SUNS; ++i) {
-		if (!state->suns[i].active) {
+		Sun *sun = &state->suns[i];
+		if (!sun->active) {
 			continue;
 		}
-		state->suns[i].collect_timer -= dt;
-		if (state->suns[i].collect_timer <= 0.0f) {
-			state->sun_count += state->suns[i].value;
-			state->suns[i].active = false;
+
+		sun->x += sun->x_vel * dt;
+		sun->y += sun->y_vel * dt;
+
+		sun->y_vel += PVZ_GRAVITY * dt;
+
+		sun->x_vel -= sun->x_vel * PVZ_SUN_POP_DAMPING * dt;
+		sun->y_vel -= sun->y_vel * PVZ_SUN_POP_DAMPING * dt;
+
+		if (sun->y >= sun->target_y) {
+			sun->y_vel = 0.0f;
+		}
+
+		sun->despawn_timer -= dt;
+		if (sun->despawn_timer <= 0.0f) {
+			// state->sun_count += state->suns[i].value;
+			sun->active = false;
 		}
 	}
 }
