@@ -2,3 +2,11 @@ build
 mx.scratch
 !.settings
 .DS_Store
+
+# In-source CMake build artifacts
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/compile_commands.json
+/cmake/stm32cubemx/CMakeFiles/
