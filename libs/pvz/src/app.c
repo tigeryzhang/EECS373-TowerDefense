@@ -48,6 +48,7 @@ void app_init(AppContext *app, const GameConfig *config) {
 	play_scene_configure(&app->play_scene, &app->play_state);
 	placeholder_scene_configure(&app->placeholder_scene, &app->placeholder_state);
 	game_init(&app->play_state.game, &app->config);
+	app->play_state.prev_game_state = app->play_state.game;
 
 	app_request_scene(app, SCENE_ID_PLAY);
 }

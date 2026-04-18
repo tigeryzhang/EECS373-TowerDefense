@@ -31,6 +31,9 @@
 #include "stm32l4xx_hal.h"
 
 #include <stdbool.h>
+
+#include "pvz_frontend.h"
+#include "pvz_uart_rx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,6 +62,7 @@ SMBUS_HandleTypeDef hsmbus2;
 
 UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_lpuart1_rx;
 
 SAI_HandleTypeDef hsai_BlockB1;
 SAI_HandleTypeDef hsai_BlockA1;
@@ -84,6 +88,7 @@ TIM_HandleTypeDef htim15;
 static RAM3_BSS RenderView render_view;
 static AppContext app;
 static RenderData render_data;
+static PvzFrontendState pvz_frontend;
 
 /* USER CODE END PV */
 
@@ -270,11 +275,18 @@ int main(void) {
 	MX_USB_OTG_FS_USB_Init();
 	/* USER CODE BEGIN 2 */
 	ILI9488_Init();
-	ILI9488_SetRotation(1);
+	ILI9488_SetRotation(3);
 
 	GameConfig config = pvz_make_default_config();
+	config.start_with_demo_layout = false;
 
 	app_init(&app, &config);
+	pvz_frontend_init(&pvz_frontend, &app.config);
+
+	PvzFrontendSnapshot frontend_snapshot = {0};
+	(void)pvz_uart_rx_init(&hlpuart1, &app.config);
+	pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, 0);
+	pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
 
 	render_view_init(&render_view, config.board_x_resolution, config.board_y_resolution, config.hud_x_resolution,
 					 config.hud_y_resolution);
@@ -306,9 +318,17 @@ int main(void) {
 
 		InputFrame input;
 		input_frame_reset(&input);
+		(void)pvz_uart_rx_read_latest(&frontend_snapshot, NULL);
+		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_us / 1000u);
+		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
+		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
 
 		// Update and render
-		if (app_update(&app, &input, frame_dt) == UPDATE_CHANGED_SCENE) {
+		const UpdateResult update_result = app_update(&app, &input, frame_dt);
+		pvz_frontend_post_update(&pvz_frontend, &app.play_state.prev_game_state, &app.play_state.game, frame_dt,
+								 play_scene_was_active);
+		pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
+		if (update_result == UPDATE_CHANGED_SCENE) {
 			app_prerender(&app, &render_view, &render_data);
 		}
 		app_render(&app, &render_view, &render_data);
@@ -624,8 +644,8 @@ static void MX_LPUART1_UART_Init(void) {
 
 	/* USER CODE END LPUART1_Init 1 */
 	hlpuart1.Instance = LPUART1;
-	hlpuart1.Init.BaudRate = 209700;
-	hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
+	hlpuart1.Init.BaudRate = 115200;
+	hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
 	hlpuart1.Init.StopBits = UART_STOPBITS_1;
 	hlpuart1.Init.Parity = UART_PARITY_NONE;
 	hlpuart1.Init.Mode = UART_MODE_TX_RX;
@@ -1133,6 +1153,9 @@ static void MX_DMA_Init(void) {
 	/* DMA1_Channel1_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+	/* DMA1_Channel2_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
 }
 
 /**
@@ -1165,6 +1188,8 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
 
 	/*Configure GPIO pin Output Level */
@@ -1193,6 +1218,12 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
+	/*Configure GPIO pin : PB14 */
+	GPIO_InitStruct.Pin = GPIO_PIN_14;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 	/*Configure GPIO pins : PD8 PD10 PD11 PD12
 							 PD13 PD14 PD15 */
 	GPIO_InitStruct.Pin =
@@ -1200,6 +1231,12 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : PD9 */
+	GPIO_InitStruct.Pin = GPIO_PIN_9;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : PC8 PC9 PC10 PC11
@@ -1240,6 +1277,12 @@ static void MX_GPIO_Init(void) {
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	GPIO_InitStruct.Alternate = GPIO_AF12_SDMMC1;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : PE0 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 	/* USER CODE BEGIN MX_GPIO_Init_2 */
 

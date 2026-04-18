@@ -44,6 +44,7 @@ static void play_scene_set_status(PlaySceneState *state, RenderStatus status, fl
 static void play_scene_enter(Scene *scene, AppContext *app) {
 	(void)scene;
 	app->play_state.accumulator = 0.0f;
+	app->play_state.prev_game_state = app->play_state.game;
 }
 
 static void play_scene_handle_command(Scene *scene, AppContext *app, InputCommand command) {
@@ -99,6 +100,7 @@ static void play_scene_handle_command(Scene *scene, AppContext *app, InputComman
 
 static void play_scene_update(Scene *scene, AppContext *app, const InputFrame *input, float frame_dt) {
 	PlaySceneState *state = (PlaySceneState *)scene->state;
+	state->prev_game_state = state->game;
 
 	for (int i = 0; i < input->count; ++i) {
 		play_scene_handle_command(scene, app, input->commands[i]);
@@ -120,14 +122,12 @@ static void play_scene_update(Scene *scene, AppContext *app, const InputFrame *i
 
 static void play_scene_prerender(Scene *scene, AppContext *app, RenderView *view, RenderData *data) {
 	PlaySceneState *state = (PlaySceneState *)scene->state;
-	(void)app;
-	presentation_prerender_play_view(view, data, &state->game);
+	presentation_prerender_play_view(view, data, &state->game, &app->play_presentation);
 }
 
 static void play_scene_render(Scene *scene, AppContext *app, RenderView *view, RenderData *data) {
 	PlaySceneState *state = (PlaySceneState *)scene->state;
-	(void)app;
-	presentation_render_play_view(view, data, &state->game, state->status);
+	presentation_render_play_view(view, data, &state->game, state->status, &app->play_presentation);
 }
 
 static void play_scene_exit(Scene *scene, AppContext *app) {

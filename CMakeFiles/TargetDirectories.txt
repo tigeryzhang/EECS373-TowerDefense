@@ -1,8 +1,0 @@
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles/pvz-with-hud.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles/pvz.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles/tft_display.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles/edit_cache.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/CMakeFiles/rebuild_cache.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
-/Users/tigerz/Documents/School/UMich/eecs_373/project/stm32/pvz-with-hud/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir

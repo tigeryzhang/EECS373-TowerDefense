@@ -57,6 +57,20 @@ typedef enum {
 
 typedef enum { RENDER_TARGET_BOARD = 0, RENDER_TARGET_HUD } RenderTarget;
 
+typedef struct {
+	bool plant_valid;
+	bool remove_required;
+	bool mismatch_warning;
+	bool flash_active;
+	RenderPalette flash_palette;
+} BoardTilePresentationState;
+
+typedef struct {
+	bool physical_mode_enabled;
+	bool suppress_card_selection;
+	BoardTilePresentationState tiles[PVZ_MAX_ROWS][PVZ_MAX_COLS];
+} PlayPresentationState;
+
 #define MAX_DIRTY_RECTS 128
 typedef struct {
 	IntRect rects[MAX_DIRTY_RECTS];
@@ -106,6 +120,8 @@ uint16_t presentation_palette_to_rgb565(RenderPalette palette);
 void dirty_rect_list_clear(DirtyRectList *rects);
 
 // Specific impls for each game scene
-void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game);
-void presentation_render_play_view(RenderView *view, RenderData *data, const GameState *game, RenderStatus status);
+void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game,
+									  const PlayPresentationState *presentation_state);
+void presentation_render_play_view(RenderView *view, RenderData *data, const GameState *game, RenderStatus status,
+								   const PlayPresentationState *presentation_state);
 void presentation_render_placeholder_view(RenderView *view, const GameConfig *config);
