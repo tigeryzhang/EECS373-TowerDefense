@@ -36,6 +36,7 @@ typedef struct {
 	bool tile_armed[PVZ_MAX_ROWS][PVZ_MAX_COLS];
 	PvzFrontendTileState tiles[PVZ_MAX_ROWS][PVZ_MAX_COLS];
 	bool hand_present;
+	bool hand_collect_pending;
 	bool sync_blocked;
 	uint32_t sync_blocked_until_ms;
 	PvzFrontendPendingActionType pending_type;

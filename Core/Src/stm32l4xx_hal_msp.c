@@ -202,26 +202,7 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* hcomp)
     /* USER CODE BEGIN COMP1_MspInit 1 */
 
     /* USER CODE END COMP1_MspInit 1 */
-  }
-  else if(hcomp->Instance==COMP2)
-  {
-    /* USER CODE BEGIN COMP2_MspInit 0 */
 
-    /* USER CODE END COMP2_MspInit 0 */
-
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**COMP2 GPIO Configuration
-    PB6     ------> COMP2_INP
-    PB7     ------> COMP2_INM
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /* USER CODE BEGIN COMP2_MspInit 1 */
-
-    /* USER CODE END COMP2_MspInit 1 */
   }
 
 }
@@ -248,22 +229,6 @@ void HAL_COMP_MspDeInit(COMP_HandleTypeDef* hcomp)
     /* USER CODE BEGIN COMP1_MspDeInit 1 */
 
     /* USER CODE END COMP1_MspDeInit 1 */
-  }
-  else if(hcomp->Instance==COMP2)
-  {
-    /* USER CODE BEGIN COMP2_MspDeInit 0 */
-
-    /* USER CODE END COMP2_MspDeInit 0 */
-
-    /**COMP2 GPIO Configuration
-    PB6     ------> COMP2_INP
-    PB7     ------> COMP2_INM
-    */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_6|GPIO_PIN_7);
-
-    /* USER CODE BEGIN COMP2_MspDeInit 1 */
-
-    /* USER CODE END COMP2_MspDeInit 1 */
   }
 
 }

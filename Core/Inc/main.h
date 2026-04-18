@@ -59,6 +59,11 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TOF_ECHO_Pin GPIO_PIN_15
+#define TOF_ECHO_GPIO_Port GPIOA
+#define TOF_ECHO_EXTI_IRQn EXTI15_10_IRQn
+#define TOF_TRIGGER_Pin GPIO_PIN_7
+#define TOF_TRIGGER_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
