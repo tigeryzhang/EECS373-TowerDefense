@@ -378,19 +378,6 @@ int main(void) {
 		}
 		app_render(&app, &render_view, &render_data);
 
-		if (tof_sensor_hand_present(&tof_sensor)) {
-			render_view.board_pixels[0] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[1] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[64] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[65] = RENDER_PALETTE_WARNING;
-		}
-		if (have_uart_snapshot) {
-			render_view.board_pixels[3] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[4] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[67] = RENDER_PALETTE_WARNING;
-			render_view.board_pixels[68] = RENDER_PALETTE_WARNING;
-		}
-
 		hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
 		upload_to_hud(&render_view);
 
