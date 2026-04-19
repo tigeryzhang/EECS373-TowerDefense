@@ -52,7 +52,6 @@ typedef enum {
 	RENDER_STATUS_NO_SUN,
 	RENDER_STATUS_NOT_FOUND,
 	RENDER_STATUS_RESET,
-	RENDER_STATUS_PLACEHOLDER,
 } RenderStatus;
 
 typedef enum { RENDER_TARGET_BOARD = 0, RENDER_TARGET_HUD } RenderTarget;
@@ -120,8 +119,13 @@ uint16_t presentation_palette_to_rgb565(RenderPalette palette);
 void dirty_rect_list_clear(DirtyRectList *rects);
 
 // Specific impls for each game scene
+void presentation_prerender_intro_view(RenderView *view, uint8_t level_count, uint8_t selected_level_index);
+void presentation_render_intro_view(RenderView *view, uint8_t level_count, uint8_t previous_level_index,
+									uint8_t selected_level_index);
 void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game,
 									  const PlayPresentationState *presentation_state);
 void presentation_render_play_view(RenderView *view, RenderData *data, const GameState *game, RenderStatus status,
 								   const PlayPresentationState *presentation_state);
-void presentation_render_placeholder_view(RenderView *view, const GameConfig *config);
+void presentation_prerender_result_view(RenderView *view);
+void presentation_render_result_view(RenderView *view, GameStatus outcome, float previous_wipe_progress_01,
+									 float wipe_progress_01);

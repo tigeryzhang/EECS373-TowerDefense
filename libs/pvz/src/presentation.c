@@ -166,6 +166,15 @@ static IntRect sun_value_origin_rect(const RenderView *view) {
 	return text_rect_3x5("", 10 + text_width_3x5("SUN: ", 3), 10, 3);
 }
 
+static IntRect intro_level_box_rect(const RenderView *view, uint8_t level_count, uint8_t level_index) {
+	const int count = clamp_int((int)level_count, 1, 9);
+	const int gap = 24;
+	const int size = clamp_int((view->hud_width - 120 - gap * (count - 1)) / count, 48, 72);
+	const int total_width = count * size + (count - 1) * gap;
+	const int start_x = (view->hud_width - total_width) / 2;
+	return pvz_rect_make(start_x + (size + gap) * (int)level_index, 132, size, size);
+}
+
 static bool render_view_contains(const RenderView *view, RenderTarget target, int x, int y) {
 	if (!view) {
 		return false;
@@ -343,6 +352,21 @@ static void draw_char_3x5(RenderView *view, RenderTarget target, char c, int x, 
 	}
 }
 
+static void draw_char_3x5_clipped(RenderView *view, RenderTarget target, char c, int x, int y, int scale,
+								  RenderPalette palette, const IntRect *clip) {
+	const uint8_t *rows = glyph_rows_for_char(c);
+	for (int row = 0; row < 5; ++row) {
+		for (int col = 0; col < 3; ++col) {
+			const int bit = 1 << (2 - col);
+			if ((rows[row] & bit) == 0) {
+				continue;
+			}
+			draw_rect_clipped(view, target, pvz_rect_make(x + col * scale, y + row * scale, scale, scale), palette, 0,
+							  clip);
+		}
+	}
+}
+
 static void draw_text_3x5(RenderView *view, RenderTarget target, const char *text, int x, int y, int scale,
 						  RenderPalette palette) {
 	if (!text || scale <= 0) {
@@ -352,6 +376,27 @@ static void draw_text_3x5(RenderView *view, RenderTarget target, const char *tex
 	for (int i = 0; text[i] != '\0'; ++i) {
 		draw_char_3x5(view, target, text[i], x + i * scale * 4, y, scale, palette);
 	}
+}
+
+static void draw_text_3x5_clipped(RenderView *view, RenderTarget target, const char *text, int x, int y, int scale,
+								  RenderPalette palette, const IntRect *clip) {
+	if (!text || scale <= 0) {
+		return;
+	}
+
+	for (int i = 0; text[i] != '\0'; ++i) {
+		draw_char_3x5_clipped(view, target, text[i], x + i * scale * 4, y, scale, palette, clip);
+	}
+}
+
+static void draw_text_3x5_centered(RenderView *view, RenderTarget target, const char *text, int center_x, int y,
+								   int scale, RenderPalette palette) {
+	draw_text_3x5(view, target, text, center_x - text_width_3x5(text, scale) / 2, y, scale, palette);
+}
+
+static void draw_text_3x5_centered_clipped(RenderView *view, RenderTarget target, const char *text, int center_x, int y,
+										   int scale, RenderPalette palette, const IntRect *clip) {
+	draw_text_3x5_clipped(view, target, text, center_x - text_width_3x5(text, scale) / 2, y, scale, palette, clip);
 }
 
 static void draw_tile_checkerboard(RenderView *view, const GameState *game, const IntRect *clip) {
@@ -834,6 +879,69 @@ static void draw_play_hud_dynamic(RenderView *view, const RenderData *data, cons
 	draw_card_cooldown_full(view, &data->frame, game->config, 2, PLANT_WALLNUT);
 }
 
+static void draw_intro_board_static(RenderView *view) {
+	const int scale = 5;
+	const int title_y = (view->board_height - 5 * scale) / 2;
+	const IntRect panel = pvz_rect_make(4, 4, view->board_width - 8, view->board_height - 8);
+
+	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
+	draw_rect(view, RENDER_TARGET_BOARD, panel, RENDER_PALETTE_PANEL, 0);
+	draw_rect(view, RENDER_TARGET_BOARD, panel, RENDER_PALETTE_HIGHLIGHT, 2);
+	draw_text_3x5_centered(view, RENDER_TARGET_BOARD, "PVZ", view->board_width / 2, title_y, scale, RENDER_PALETTE_TEXT);
+}
+
+static void draw_intro_level_box(RenderView *view, uint8_t level_count, uint8_t level_index, bool selected) {
+	char label[4];
+	const IntRect rect = intro_level_box_rect(view, level_count, level_index);
+	const int scale = clamp_int(rect.w / 6, 8, 12);
+
+	snprintf(label, sizeof(label), "%u", (unsigned)(level_index + 1));
+	const int text_x = rect.x + (rect.w - text_width_3x5(label, scale)) / 2;
+	const int text_y = rect.y + (rect.h - 5 * scale) / 2;
+	draw_rect(view, RENDER_TARGET_HUD, rect, RENDER_PALETTE_PANEL, 0);
+	draw_rect(view, RENDER_TARGET_HUD, rect, selected ? RENDER_PALETTE_HIGHLIGHT : RENDER_PALETTE_TEXT,
+			  selected ? 4 : 2);
+	draw_text_3x5(view, RENDER_TARGET_HUD, label, text_x, text_y, scale, RENDER_PALETTE_TEXT);
+}
+
+static void draw_intro_hud_static(RenderView *view, uint8_t level_count, uint8_t selected_level_index) {
+	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_PANEL);
+	draw_text_3x5_centered(view, RENDER_TARGET_HUD, "SELECT LEVEL", view->hud_width / 2, 36, 5, RENDER_PALETTE_TEXT);
+	draw_text_3x5_centered(view, RENDER_TARGET_HUD, "WAVE HAND TO START", view->hud_width / 2, 84, 3,
+						   RENDER_PALETTE_TEXT);
+
+	for (uint8_t index = 0; index < level_count; ++index) {
+		draw_intro_level_box(view, level_count, index, index == selected_level_index);
+	}
+}
+
+static void redraw_intro_level_box(RenderView *view, uint8_t level_count, uint8_t level_index, bool selected) {
+	const IntRect rect = intro_level_box_rect(view, level_count, level_index);
+	draw_intro_level_box(view, level_count, level_index, selected);
+	mark_dirty_rect(view, RENDER_TARGET_HUD, rect);
+}
+
+static const char *result_message_for_status(GameStatus outcome) {
+	return outcome == GAME_STATUS_WON ? "YOU WIN" : "YOU LOSE";
+}
+
+static int result_wipe_width(const RenderView *view, float progress_01) {
+	int width = (int)lroundf(progress_01 * (float)view->board_width);
+	if (width < 0) {
+		width = 0;
+	}
+	if (width > view->board_width) {
+		width = view->board_width;
+	}
+	return width;
+}
+
+static void draw_result_text_clipped(RenderView *view, GameStatus outcome, const IntRect *clip) {
+	const int scale = 2;
+	draw_text_3x5_centered_clipped(view, RENDER_TARGET_BOARD, result_message_for_status(outcome), view->board_width / 2,
+								   (view->board_height - 5 * scale) / 2, scale, RENDER_PALETTE_TEXT, clip);
+}
+
 void render_view_init(RenderView *view, int board_width, int board_height, int hud_width, int hud_height) {
 	if (!view) {
 		return;
@@ -885,6 +993,23 @@ void dirty_rect_list_clear(DirtyRectList *rects) {
 		return;
 	}
 	rects->count = 0;
+}
+
+void presentation_prerender_intro_view(RenderView *view, uint8_t level_count, uint8_t selected_level_index) {
+	draw_intro_board_static(view);
+	draw_intro_hud_static(view, level_count, selected_level_index);
+	mark_full_target_dirty(view, RENDER_TARGET_BOARD);
+	mark_full_target_dirty(view, RENDER_TARGET_HUD);
+}
+
+void presentation_render_intro_view(RenderView *view, uint8_t level_count, uint8_t previous_level_index,
+									uint8_t selected_level_index) {
+	if (level_count == 0 || previous_level_index == selected_level_index) {
+		return;
+	}
+
+	redraw_intro_level_box(view, level_count, previous_level_index, false);
+	redraw_intro_level_box(view, level_count, selected_level_index, true);
 }
 
 void presentation_prerender_play_view(RenderView *view, RenderData *data, const GameState *game,
@@ -1012,31 +1137,24 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 	}
 }
 
-void presentation_render_placeholder_view(RenderView *view, const GameConfig *config) {
-	(void)config;
+void presentation_prerender_result_view(RenderView *view) {
+	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_PANEL);
+	draw_text_3x5_centered(view, RENDER_TARGET_HUD, "WAVE YOUR HAND OVER THE BOARD TO CONTINUE", view->hud_width / 2,
+						   (view->hud_height - 10) / 2, 2, RENDER_PALETTE_TEXT);
+	mark_full_target_dirty(view, RENDER_TARGET_HUD);
+}
 
-	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
-	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_BG);
+void presentation_render_result_view(RenderView *view, GameStatus outcome, float previous_wipe_progress_01,
+									 float wipe_progress_01) {
+	const int previous_width = result_wipe_width(view, previous_wipe_progress_01);
+	const int current_width = result_wipe_width(view, wipe_progress_01);
 
-	for (int y = 0; y < view->board_height; ++y) {
-		for (int x = 0; x < view->board_width; ++x) {
-			if (((x / 8) + (y / 8)) % 2 == 0) {
-				set_pixel(view, RENDER_TARGET_BOARD, x, y, RENDER_PALETTE_TILE_DARK);
-			} else {
-				set_pixel(view, RENDER_TARGET_BOARD, x, y, RENDER_PALETTE_TILE_LIGHT);
-			}
-		}
+	if (current_width <= previous_width) {
+		return;
 	}
 
-	draw_rect(
-		view, RENDER_TARGET_BOARD,
-		pvz_rect_make(view->board_width / 4, view->board_height / 4, view->board_width / 2, view->board_height / 2),
-		RENDER_PALETTE_PANEL, 0);
-	draw_rect(view, RENDER_TARGET_BOARD,
-			  pvz_rect_make(view->board_width / 4 + 4, view->board_height / 4 + 4, view->board_width / 2 - 8,
-							view->board_height / 2 - 8),
-			  RENDER_PALETTE_BLACK, 0);
-
-	mark_full_target_dirty(view, RENDER_TARGET_BOARD);
-	mark_full_target_dirty(view, RENDER_TARGET_HUD);
+	const IntRect strip = pvz_rect_make(view->board_width - current_width, 0, current_width - previous_width,
+										view->board_height);
+	draw_rect(view, RENDER_TARGET_BOARD, strip, RENDER_PALETTE_PANEL, 0);
+	draw_result_text_clipped(view, outcome, &strip);
 }

@@ -16,19 +16,31 @@ typedef struct {
 } PlaySceneState;
 
 typedef struct {
-	float elapsed;
-} PlaceholderSceneState;
+	uint8_t selected_level_index;
+	uint8_t previous_level_index;
+	float cycle_timer_sec;
+	bool selection_dirty;
+} IntroSceneState;
+
+typedef struct {
+	GameStatus outcome;
+	float wipe_progress_01;
+	float previous_wipe_progress_01;
+	bool wipe_complete;
+} ResultSceneState;
 
 typedef struct AppContext {
 	GameConfig config;
 	bool quit_requested;
 	SceneId active_scene_id;
 	Scene *active_scene;
+	Scene intro_scene;
 	Scene play_scene;
-	Scene placeholder_scene;
+	Scene result_scene;
+	IntroSceneState intro_state;
 	PlaySceneState play_state;
 	PlayPresentationState play_presentation;
-	PlaceholderSceneState placeholder_state;
+	ResultSceneState result_state;
 } AppContext;
 
 void app_init(AppContext *app, const GameConfig *config);
@@ -37,5 +49,6 @@ UpdateResult app_update(AppContext *app, const InputFrame *input, float frame_dt
 void app_prerender(AppContext *app, RenderView *view, RenderData *data);
 void app_render(AppContext *app, RenderView *view, RenderData *data);
 void app_request_scene(AppContext *app, SceneId next_scene);
+void intro_scene_configure(Scene *scene, IntroSceneState *state);
 void play_scene_configure(Scene *scene, PlaySceneState *state);
-void placeholder_scene_configure(Scene *scene, PlaceholderSceneState *state);
+void result_scene_configure(Scene *scene, ResultSceneState *state);

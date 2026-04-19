@@ -45,6 +45,8 @@ static void play_scene_enter(Scene *scene, AppContext *app) {
 	(void)scene;
 	app->play_state.accumulator = 0.0f;
 	app->play_state.prev_game_state = app->play_state.game;
+	app->play_state.status = RENDER_STATUS_NONE;
+	app->play_state.status_timer = 0.0f;
 }
 
 static void play_scene_handle_command(Scene *scene, AppContext *app, InputCommand command) {
@@ -97,10 +99,7 @@ static void play_scene_handle_command(Scene *scene, AppContext *app, InputComman
 		game_apply_command(&state->game, (GameCommand){.type = GAME_COMMAND_RESTART});
 		play_scene_set_status(state, RENDER_STATUS_RESET, 1.0f);
 		break;
-	case INPUT_COMMAND_GOTO_PLACEHOLDER_SCENE:
-		scene_request(scene, SCENE_ID_PLACEHOLDER);
-		break;
-	case INPUT_COMMAND_GOTO_PLAY_SCENE:
+	case INPUT_COMMAND_HAND_TRIGGER:
 	case INPUT_COMMAND_NONE:
 	default:
 		break;
@@ -126,6 +125,14 @@ static void play_scene_update(Scene *scene, AppContext *app, const InputFrame *i
 	while (state->accumulator >= app->config.fixed_dt) {
 		game_step(&state->game, app->config.fixed_dt);
 		state->accumulator -= app->config.fixed_dt;
+	}
+
+	if (state->game.status == GAME_STATUS_WON || state->game.status == GAME_STATUS_LOST) {
+		app->result_state.outcome = state->game.status;
+		app->result_state.wipe_progress_01 = 0.0f;
+		app->result_state.previous_wipe_progress_01 = 0.0f;
+		app->result_state.wipe_complete = false;
+		scene_request(scene, SCENE_ID_RESULT);
 	}
 }
 

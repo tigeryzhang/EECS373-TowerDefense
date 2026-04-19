@@ -49,13 +49,14 @@ set(PVZ_SOURCES
     libs/pvz/src/app.c
     libs/pvz/src/game.c
     libs/pvz/src/game_types.c
+    libs/pvz/src/intro_scene.c
     libs/pvz/src/input.c
-    libs/pvz/src/placeholder_scene.c
     libs/pvz/src/play_scene.c
     libs/pvz/src/presentation.c
     libs/pvz/src/pvz_config.c
     libs/pvz/src/pvz_rect.c
     libs/pvz/src/pvz_utils.c
+    libs/pvz/src/result_scene.c
     libs/pvz/src/render_assets.c
 )
 
