@@ -323,7 +323,7 @@ void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnap
 	state->raw_snapshot.hand_present = snapshot->hand_present;
 	state->hand_present = snapshot->hand_present;
 	if (snapshot->hand_present && !previous_hand_present) {
-		state->hand_collect_pending = true;
+		state->hand_event_pending = true;
 	}
 	if (snapshot->hand_present) {
 		state->sync_blocked_until_ms = now_ms + PVZ_FRONTEND_HAND_GRACE_MS;
@@ -373,25 +373,31 @@ void pvz_frontend_ingest_snapshot(PvzFrontendState *state, const PvzFrontendSnap
 }
 
 // Compares stable physical state against live game state and emits at most one emulated action.
-void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, InputFrame *input, bool play_scene_active) {
-	if (!state || !game || !input || !state->config || !play_scene_active) {
-		if (state != NULL && !play_scene_active) {
-			state->hand_collect_pending = false;
+void pvz_frontend_build_input(PvzFrontendState *state, const GameState *game, InputFrame *input, SceneId active_scene_id) {
+	if (!state || !game || !input || !state->config) {
+		return;
+	}
+
+	if (state->hand_event_pending) {
+		InputCommandType command_type = INPUT_COMMAND_NONE;
+		if (active_scene_id == SCENE_ID_PLAY) {
+			command_type = INPUT_COMMAND_COLLECT_SUN;
+		} else if (active_scene_id == SCENE_ID_INTRO || active_scene_id == SCENE_ID_RESULT) {
+			command_type = INPUT_COMMAND_HAND_TRIGGER;
+		}
+		if (command_type != INPUT_COMMAND_NONE && input_frame_push(input, (InputCommand){.type = command_type})) {
+			state->hand_event_pending = false;
 		}
 		return;
 	}
+
+	if (active_scene_id != SCENE_ID_PLAY) {
+		return;
+	}
+
 	if (state->pending_type != PVZ_FRONTEND_PENDING_NONE) {
 		return;
 	}
-
-	if (state->hand_collect_pending) {
-		if (input_frame_push(input, (InputCommand){.type = INPUT_COMMAND_COLLECT_SUN})) {
-			state->hand_collect_pending = false;
-		}
-		return;
-	}
-
-	// return;
 
 	if (state->sync_blocked) {
 		return;

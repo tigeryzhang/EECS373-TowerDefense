@@ -7,8 +7,9 @@ struct AppContext;
 
 typedef enum {
 	SCENE_ID_NONE = 0,
+	SCENE_ID_INTRO,
 	SCENE_ID_PLAY,
-	SCENE_ID_PLACEHOLDER,
+	SCENE_ID_RESULT,
 } SceneId;
 
 // Forward declaration

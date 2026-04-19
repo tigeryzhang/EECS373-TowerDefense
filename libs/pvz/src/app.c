@@ -5,10 +5,12 @@
 
 static Scene *find_scene(AppContext *app, SceneId scene_id) {
 	switch (scene_id) {
+	case SCENE_ID_INTRO:
+		return &app->intro_scene;
 	case SCENE_ID_PLAY:
 		return &app->play_scene;
-	case SCENE_ID_PLACEHOLDER:
-		return &app->placeholder_scene;
+	case SCENE_ID_RESULT:
+		return &app->result_scene;
 	case SCENE_ID_NONE:
 	default:
 		return NULL;
@@ -45,12 +47,14 @@ void app_init(AppContext *app, const GameConfig *config) {
 	app->config = *config;
 	pvz_clamp_config(&app->config);
 
+	intro_scene_configure(&app->intro_scene, &app->intro_state);
 	play_scene_configure(&app->play_scene, &app->play_state);
-	placeholder_scene_configure(&app->placeholder_scene, &app->placeholder_state);
+	result_scene_configure(&app->result_scene, &app->result_state);
 	game_init(&app->play_state.game, &app->config);
 	app->play_state.prev_game_state = app->play_state.game;
+	app->result_state.outcome = GAME_STATUS_LOST;
 
-	app_request_scene(app, SCENE_ID_PLAY);
+	app_request_scene(app, SCENE_ID_INTRO);
 }
 
 void app_shutdown(AppContext *app) { (void)app; }

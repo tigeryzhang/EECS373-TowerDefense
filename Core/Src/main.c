@@ -283,7 +283,7 @@ int main(void) {
 	/* Configure the peripherals common clocks */
 	PeriphCommonClock_Config();
 
-	/* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit
 
 	/* USER CODE END SysInit */
 
@@ -353,6 +353,7 @@ int main(void) {
 		const float frame_dt =
 			frame_pacing_frame_dt_from_elapsed_ms(frame_start_ms - previous_frame_start_ms, app.config.fixed_dt);
 		previous_frame_start_ms = frame_start_ms;
+		bool hud_uploaded_from_prerender = false;
 
 		InputFrame input;
 		input_frame_reset(&input);
@@ -366,7 +367,7 @@ int main(void) {
 		frontend_snapshot.hand_present = tof_sensor_hand_present(&tof_sensor);
 		pvz_frontend_ingest_snapshot(&pvz_frontend, &frontend_snapshot, frame_start_ms, snapshot_is_new);
 		const bool play_scene_was_active = app.active_scene_id == SCENE_ID_PLAY;
-		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, play_scene_was_active);
+		pvz_frontend_build_input(&pvz_frontend, &app.play_state.game, &input, app.active_scene_id);
 
 		// Update and render
 		const UpdateResult update_result = app_update(&app, &input, frame_dt);
@@ -375,11 +376,16 @@ int main(void) {
 		pvz_frontend_export_presentation_state(&pvz_frontend, &app.play_state.game, &app.play_presentation);
 		if (update_result == UPDATE_CHANGED_SCENE) {
 			app_prerender(&app, &render_view, &render_data);
+			upload_to_hud(&render_view);
+			hud_uploaded_from_prerender = true;
+		} else {
+			app_render(&app, &render_view, &render_data);
 		}
-		app_render(&app, &render_view, &render_data);
 
 		hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
-		upload_to_hud(&render_view);
+		if (!hud_uploaded_from_prerender) {
+			upload_to_hud(&render_view);
+		}
 
 		/* USER CODE END WHILE */
 
