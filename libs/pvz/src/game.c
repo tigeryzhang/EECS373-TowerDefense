@@ -14,32 +14,11 @@
 #define PVZ_SUN_POP_DAMPING 2.3f
 #define PVZ_GRAVITY 3.0f
 
-// static const PvzSpawnGroup level_0_wave_0_groups[] = {
-// 	{.type = ZOMBIE_REGULAR,
-// 	 .count = 3,
-// 	 .first_spawn_delay_sec = 0.0f,
-// 	 .spawn_interval_sec = 1.8f,
-// 	 .lane = PVZ_LANE_AUTO,
-// 	 .lane_mask = PVZ_LANE_MASK_ALL},
-// };
-
 static const PvzSpawnGroup level_0_wave_0_groups[] = {
 	{.type = ZOMBIE_REGULAR,
-	 .count = 1,
+	 .count = 3,
 	 .first_spawn_delay_sec = 0.0f,
-	 .spawn_interval_sec = 1.4f,
-	 .lane = PVZ_LANE_AUTO,
-	 .lane_mask = PVZ_LANE_MASK_ALL},
-	{.type = ZOMBIE_CONE,
-	 .count = 1,
-	 .first_spawn_delay_sec = 0.0f,
-	 .spawn_interval_sec = 2.0f,
-	 .lane = PVZ_LANE_AUTO,
-	 .lane_mask = PVZ_LANE_MASK_ALL},
-	{.type = ZOMBIE_BUCKETHEAD,
-	 .count = 1,
-	 .first_spawn_delay_sec = 0.0f,
-	 .spawn_interval_sec = 2.0f,
+	 .spawn_interval_sec = 1.8f,
 	 .lane = PVZ_LANE_AUTO,
 	 .lane_mask = PVZ_LANE_MASK_ALL},
 };
@@ -82,8 +61,7 @@ static const PvzSpawnGroup level_0_wave_2_groups[] = {
 
 static const PvzWaveDef level_0_waves[] = {
 	{.groups = level_0_wave_0_groups,
-	//  .group_count = 1,
-	 .group_count = 3,
+	 .group_count = 1,
 	 .start_delay_sec = 0.0f,
 	 .drain_threshold = 0,
 	 .flags = PVZ_WAVE_FLAG_NONE,
