@@ -275,7 +275,7 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
     hdma_dac1_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
     hdma_dac1_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
     hdma_dac1_ch1.Init.Mode = DMA_CIRCULAR;
-    hdma_dac1_ch1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    hdma_dac1_ch1.Init.Priority = DMA_PRIORITY_HIGH;
     if (HAL_DMA_Init(&hdma_dac1_ch1) != HAL_OK)
     {
       Error_Handler();
@@ -532,7 +532,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_spi1_tx.Init.Mode = DMA_NORMAL;
-    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    hdma_spi1_tx.Init.Priority = DMA_PRIORITY_HIGH;
     if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK)
     {
       Error_Handler();
@@ -585,7 +585,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
     hdma_spi3_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_spi3_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_spi3_rx.Init.Mode = DMA_NORMAL;
-    hdma_spi3_rx.Init.Priority = DMA_PRIORITY_HIGH;
+    hdma_spi3_rx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     if (HAL_DMA_Init(&hdma_spi3_rx) != HAL_OK)
     {
       Error_Handler();

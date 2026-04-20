@@ -4,14 +4,7 @@
 #ifndef SPEAKER_H_
 #define SPEAKER_H_
 
-#include "stm32l4xx_hal.h"
 #include <stdint.h>
-#include "main.h"
-#include "fatfs.h"
-
-/* === DAC / Timer Handles (defined by CubeMX in main.c) === */
-extern DAC_HandleTypeDef  hdac1;
-extern TIM_HandleTypeDef  htim6;
 
 #define AUDIO_BUFFER_SIZE   4096
 #define FILE_BUFFER_SIZE  	16384
@@ -20,6 +13,7 @@ extern TIM_HandleTypeDef  htim6;
 void AUDIO_Init(void);
 void AUDIO_Play(void);
 void AUDIO_Stop(void);
+void AUDIO_StopAllTracks(void);
 void AUDIO_PlayMusic_File(const char *filename);
 void AUDIO_PlayOnce_File(const char *filename);   // one-shot, no loop
 void AUDIO_PlaySFX_File(const char *filename);

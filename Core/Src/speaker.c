@@ -1,8 +1,21 @@
 #include "speaker.h"
+#include "fatfs.h"
+#include "main.h"
+#include "stm32l4xx_hal.h"
 #include <string.h>
+
+extern DAC_HandleTypeDef hdac1;
+extern TIM_HandleTypeDef htim6;
+
+#define AUDIO_REFILL_CHUNK_BYTES       512u
+#define AUDIO_START_PRIME_BYTES        AUDIO_BUFFER_SIZE
+#define AUDIO_MAX_REFILL_CHUNKS_PER_TASK 4u
+#define AUDIO_DMA_FILL_FIRST_HALF      0x01u
+#define AUDIO_DMA_FILL_SECOND_HALF     0x02u
 
 /* ================= DAC BUFFER ================= */
 static uint16_t dac_buffer[AUDIO_BUFFER_SIZE];
+static volatile uint8_t audio_dma_fill_pending = 0u;
 
 /* ================= TRACK ================= */
 typedef struct {
@@ -18,6 +31,22 @@ typedef struct {
 static AudioTrack bgm_track;
 static AudioTrack sfx_track;
 static uint8_t playing_sfx = 0;
+
+static void AUDIO_ResetTrack(AudioTrack *track)
+{
+    track->active = 0;
+    track->looping = 0;
+    track->read_pos = 0;
+    track->write_pos = 0;
+}
+
+static void AUDIO_CloseTrack(AudioTrack *track)
+{
+    if (track->active) {
+        f_close(&track->file);
+    }
+    AUDIO_ResetTrack(track);
+}
 
 /* ===================================================== */
 /* ================= WAV PARSER ========================= */
@@ -81,13 +110,7 @@ static uint32_t RingBuffer_FreeSpace(AudioTrack *track)
 
 static void AUDIO_StartTrack(AudioTrack *track, const char *filename, uint8_t loop)
 {
-    // Close previous file if open
-    if (track->active)
-        f_close(&track->file);
-
-    track->active = 0;
-    track->read_pos = 0;
-    track->write_pos = 0;
+    AUDIO_CloseTrack(track);
 
     if (f_open(&track->file, filename, FA_READ) != FR_OK)
         return;
@@ -102,24 +125,23 @@ static void AUDIO_StartTrack(AudioTrack *track, const char *filename, uint8_t lo
 /* ================= BUFFER REFILL ====================== */
 /* ===================================================== */
 
-static void AUDIO_RefillTrack(AudioTrack *track)
+static uint8_t AUDIO_RefillTrackChunk(AudioTrack *track)
 {
-    if (!track->active) return;
+    if (!track->active || RingBuffer_FreeSpace(track) < AUDIO_REFILL_CHUNK_BYTES) {
+        return 0;
+    }
 
-    // Refill in 512-byte chunks as long as there's space
-    while (RingBuffer_FreeSpace(track) >= 512)
-    {
+    while (1) {
         UINT br;
         // How much space before wrap-around?
         uint32_t to_end = FILE_BUFFER_SIZE - track->write_pos;
-        uint32_t chunk  = (to_end < 512) ? to_end : 512;
+        uint32_t chunk  = (to_end < AUDIO_REFILL_CHUNK_BYTES) ? to_end : AUDIO_REFILL_CHUNK_BYTES;
 
         f_read(&track->file, &track->buffer[track->write_pos], chunk, &br);
 
         if (br == 0) {
             if (track->looping) {
                 f_lseek(&track->file, track->data_start);
-                // Don't return — loop around and keep filling
                 continue;
             } else {
                 // EOF, non-looping: mark inactive when buffer drains
@@ -129,14 +151,31 @@ static void AUDIO_RefillTrack(AudioTrack *track)
                 // Zero-pad the rest of this chunk
                 memset(&track->buffer[track->write_pos], 0, chunk);
                 track->write_pos = (track->write_pos + chunk) % FILE_BUFFER_SIZE;
-                break;
+                return 1;
             }
         }
 
         track->write_pos = (track->write_pos + br) % FILE_BUFFER_SIZE;
 
-        // Partial read (wrap boundary) — do second half next call
-        if (br < chunk) break;
+        return 1;
+    }
+}
+
+static void AUDIO_PrimeTrack(AudioTrack *track, uint32_t min_available_bytes)
+{
+    while (track->active && RingBuffer_Available(track) < min_available_bytes) {
+        if (!AUDIO_RefillTrackChunk(track)) {
+            break;
+        }
+    }
+}
+
+static void AUDIO_RefillTrack(AudioTrack *track, uint32_t max_chunks)
+{
+    for (uint32_t chunk_index = 0; chunk_index < max_chunks; ++chunk_index) {
+        if (!AUDIO_RefillTrackChunk(track)) {
+            break;
+        }
     }
 }
 
@@ -148,20 +187,18 @@ static int16_t AUDIO_ReadSample(AudioTrack *track)
 {
     if (!track->active) return 0;
 
-    // Need 2 bytes available
-    if (RingBuffer_Available(track) < 2) {
-        // Buffer underrun — return silence
-        // If file is exhausted (not looping, file closed), deactivate
+    // Need 1 byte now
+    if (RingBuffer_Available(track) < 1) {
         if (!track->looping) track->active = 0;
         return 0;
     }
 
-    int16_t sample =
-        (int16_t)(track->buffer[track->read_pos] |
-                 (track->buffer[(track->read_pos + 1) % FILE_BUFFER_SIZE] << 8));
+    uint8_t byte = track->buffer[track->read_pos];
 
-    track->read_pos = (track->read_pos + 2) % FILE_BUFFER_SIZE;
-    return sample;
+    track->read_pos = (track->read_pos + 1) % FILE_BUFFER_SIZE;
+
+    // Convert unsigned 8-bit → signed 16-bit
+    return ((int16_t)byte - 128) << 8;
 }
 
 /* ===================================================== */
@@ -186,11 +223,30 @@ static void AUDIO_FillBuffer(uint16_t *buf, uint32_t len)
 
 
         // OR a slightly louder "Headroom" mix (e.g., 80% each)
-        // int32_t mixed = (bgm * 1 / 10) + (sfx * 4 / 5);
-        int32_t mixed = (bgm >> 2) + (sfx >> 1);
+        int32_t mixed = (bgm >> 2) + (sfx >> 2);
 
         // Convert signed 16-bit → unsigned 12-bit for DAC
         buf[i] = (uint16_t)((mixed + 32768) >> 4);
+    }
+}
+
+static void AUDIO_ServicePendingDmaFills(void)
+{
+    uint8_t pending;
+    const uint32_t primask = __get_PRIMASK();
+
+    __disable_irq();
+    pending = audio_dma_fill_pending;
+    audio_dma_fill_pending = 0u;
+    if (primask == 0u) {
+        __enable_irq();
+    }
+
+    if ((pending & AUDIO_DMA_FILL_FIRST_HALF) != 0u) {
+        AUDIO_FillBuffer(&dac_buffer[0], AUDIO_BUFFER_SIZE / 2);
+    }
+    if ((pending & AUDIO_DMA_FILL_SECOND_HALF) != 0u) {
+        AUDIO_FillBuffer(&dac_buffer[AUDIO_BUFFER_SIZE / 2], AUDIO_BUFFER_SIZE / 2);
     }
 }
 
@@ -201,19 +257,20 @@ static void AUDIO_FillBuffer(uint16_t *buf, uint32_t len)
 void AUDIO_PlayMusic_File(const char *filename)
 {
     AUDIO_StartTrack(&bgm_track, filename, 1);
-    // Pre-fill the entire ring buffer before playback
-    AUDIO_RefillTrack(&bgm_track);
+    AUDIO_PrimeTrack(&bgm_track, AUDIO_START_PRIME_BYTES);
 }
 
 void AUDIO_PlaySFX_File(const char *filename)
 {
     AUDIO_StartTrack(&sfx_track, filename, 0);
-    AUDIO_RefillTrack(&sfx_track);
+    AUDIO_PrimeTrack(&sfx_track, AUDIO_START_PRIME_BYTES);
     playing_sfx = 1;
 }
 
 void AUDIO_Play(void)
 {
+    audio_dma_fill_pending = 0u;
+
     // Fill first half and second half explicitly so DMA
     // double-buffer starts in a known state
     AUDIO_FillBuffer(&dac_buffer[0],                   AUDIO_BUFFER_SIZE / 2);
@@ -235,32 +292,41 @@ void AUDIO_Stop(void)
     HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
     HAL_TIM_Base_Stop(&htim6);
 
-    if (bgm_track.active) { f_close(&bgm_track.file); bgm_track.active = 0; }
-    if (sfx_track.active) { f_close(&sfx_track.file); sfx_track.active = 0; }
+    AUDIO_StopAllTracks();
+    audio_dma_fill_pending = 0u;
+}
+
+void AUDIO_StopAllTracks(void)
+{
+    AUDIO_CloseTrack(&bgm_track);
+    AUDIO_CloseTrack(&sfx_track);
     playing_sfx = 0;
 }
 
 // Call this from your main loop — handles SD card reads outside of IRQ
 void AUDIO_Task(void)
 {
-    AUDIO_RefillTrack(&bgm_track);
-    if (playing_sfx)
-        AUDIO_RefillTrack(&sfx_track);
+    AUDIO_RefillTrack(&bgm_track, AUDIO_MAX_REFILL_CHUNKS_PER_TASK);
+    if (playing_sfx) {
+        AUDIO_RefillTrack(&sfx_track, AUDIO_MAX_REFILL_CHUNKS_PER_TASK);
+    }
+    AUDIO_ServicePendingDmaFills();
+}
+
+void AUDIO_PlayOnce_File(const char *filename)
+{
+    AUDIO_CloseTrack(&bgm_track);
+    AUDIO_PlaySFX_File(filename);
 }
 
 void AUDIO_PlayOnce(const char *filename)
 {
-    // 1. Stop the Background Music track specifically
-    if (bgm_track.active) {
-        f_close(&bgm_track.file);
-        bgm_track.active = 0;
-        bgm_track.read_pos = 0;
-        bgm_track.write_pos = 0;
-    }
+    AUDIO_PlayOnce_File(filename);
+}
 
-    // 2. Start the new file as an SFX (one-shot)
-    // Your existing AUDIO_PlaySFX_File already sets loop = 0
-    AUDIO_PlaySFX_File(filename);
+uint8_t AUDIO_IsBGMFinished(void)
+{
+    return (uint8_t)(bgm_track.active == 0u);
 }
 
 /* ===================================================== */
@@ -270,10 +336,12 @@ void AUDIO_PlayOnce(const char *filename)
 // Runs in IRQ — fill the half that DMA just finished playing
 void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac)
 {
-    AUDIO_FillBuffer(&dac_buffer[0], AUDIO_BUFFER_SIZE / 2);
+    (void)hdac;
+    audio_dma_fill_pending |= AUDIO_DMA_FILL_FIRST_HALF;
 }
 
 void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)
 {
-    AUDIO_FillBuffer(&dac_buffer[AUDIO_BUFFER_SIZE / 2], AUDIO_BUFFER_SIZE / 2);
+    (void)hdac;
+    audio_dma_fill_pending |= AUDIO_DMA_FILL_SECOND_HALF;
 }

@@ -344,6 +344,9 @@ int main(void) {
 	init_hub75_palette();
 	hub75_upload_indexed_64x32(render_view.board_pixels, (uint16_t)render_view.board_width);
 	hub75_start();
+
+	HAL_NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 1, 0);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -353,9 +356,7 @@ int main(void) {
 	tof_sensor_init(&tof_sensor);
 	tof_next_measurement_us = frame_timer_now_us();
 
-	// Start background music
-	// AUDIO_PlayMusic_File("bg8bit.wav");
-	// AUDIO_Play();
+	AUDIO_Play();
 
 	const uint32_t target_frame_ms = frame_pacing_target_frame_ms(app.config.fixed_dt);
 	uint32_t previous_frame_start_ms = HAL_GetTick() - target_frame_ms;
@@ -403,7 +404,7 @@ int main(void) {
 			upload_to_hud(&render_view);
 		}
 
-		// AUDIO_Task();
+		AUDIO_Task();
 
 		/* USER CODE END WHILE */
 
@@ -1193,7 +1194,7 @@ static void MX_DMA_Init(void) {
 	HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
 	/* DMA1_Channel5_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 }
 
