@@ -611,7 +611,7 @@ static IntRect cooldown_filled_rect(IntRect rect, int fill_pixels) {
 
 static RenderPalette cooldown_empty_palette(void) {
 	// The bar returns to this dark track color whenever cooldown pixels become empty.
-	return RENDER_PALETTE_TILE_DARK;
+	return RENDER_PALETTE_PANEL;
 }
 
 static int wave_fill_width(const RenderView *view, const FrameData *frame) {
