@@ -13,7 +13,7 @@
 #define TFT_DC_PIN GPIO_PIN_1
 
 #define TFT_CS_PORT GPIOA
-#define TFT_CS_PIN GPIO_PIN_4
+#define TFT_CS_PIN GPIO_PIN_2
 
 #define TFT_RST_PORT GPIOA
 #define TFT_RST_PIN GPIO_PIN_0
