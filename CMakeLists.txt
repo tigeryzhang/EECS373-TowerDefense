@@ -43,6 +43,7 @@ set(APP_SOURCES
     Core/Src/pvz_uart_protocol.c
     Core/Src/pvz_uart_rx.c
     Core/Src/pvz_rng.c
+    Core/Src/speaker.c
 )
 
 set(PVZ_SOURCES

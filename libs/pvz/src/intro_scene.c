@@ -1,14 +1,16 @@
 #include "app.h"
 #include "presentation.h"
+#include "speaker.h"
 
 #include <string.h>
 
 static const float INTRO_LEVEL_CYCLE_SEC = 2.0f;
 
 static void intro_scene_enter(Scene *scene, AppContext *app) {
+	IntroSceneState *state = (IntroSceneState *)scene->state;
 	(void)app;
 
-	IntroSceneState *state = (IntroSceneState *)scene->state;
+	AUDIO_StopAllTracks();
 	state->selected_level_index = 0;
 	state->previous_level_index = 0;
 	state->cycle_timer_sec = 0.0f;
@@ -29,6 +31,7 @@ static void intro_scene_update(Scene *scene, AppContext *app, const InputFrame *
 		state->previous_level_index = state->selected_level_index;
 		state->selected_level_index = (uint8_t)((state->selected_level_index + 1) % level_count);
 		state->selection_dirty = true;
+		AUDIO_PlaySFX_File("splat.wav");
 	}
 
 	for (int index = 0; index < input->count; ++index) {

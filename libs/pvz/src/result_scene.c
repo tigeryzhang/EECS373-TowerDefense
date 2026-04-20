@@ -1,5 +1,6 @@
 #include "app.h"
 #include "presentation.h"
+#include "speaker.h"
 
 #include <string.h>
 
@@ -11,6 +12,12 @@ static void result_scene_enter(Scene *scene, AppContext *app) {
 	state->wipe_progress_01 = 0.0f;
 	state->previous_wipe_progress_01 = 0.0f;
 	state->wipe_complete = false;
+
+	if (app->result_state.outcome == GAME_STATUS_WON) {
+		AUDIO_PlayOnce_File("winmusic.wav");
+	} else {
+		AUDIO_PlayOnce_File("lose.wav");
+	}
 
 	app->intro_state.selected_level_index = 0;
 	app->intro_state.previous_level_index = 0;
