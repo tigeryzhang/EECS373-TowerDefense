@@ -13,6 +13,7 @@
 #define PVZ_SUN_POP_SIDE_SPEED_MAX 2.3f
 #define PVZ_SUN_POP_DAMPING 2.3f
 #define PVZ_GRAVITY 3.0f
+#define PVZ_ZOMBIE_PROJECTILE_HITBOX_WIDTH 0.70f
 
 static const PvzSpawnGroup level_0_wave_0_groups[] = {
 	{.type = ZOMBIE_REGULAR,
@@ -837,6 +838,14 @@ static void step_suns(GameState *state, float dt) {
 	}
 }
 
+static bool projectile_overlaps_zombie(float previous_x, float current_x, const Zombie *zombie) {
+	// Zombie x tracks its leading edge in lane space, so projectile contact should start there rather than
+	// around a symmetric band centered ahead of the sprite.
+	const float hitbox_start = zombie->x;
+	const float hitbox_end = zombie->x + PVZ_ZOMBIE_PROJECTILE_HITBOX_WIDTH;
+	return !(hitbox_end < previous_x || hitbox_start > current_x);
+}
+
 static void step_plants(GameState *state, float dt) {
 	for (int i = 0; i < PVZ_MAX_PLANTS; ++i) {
 		if (!state->plants[i].active) {
@@ -881,7 +890,7 @@ static void step_projectiles(GameState *state, float dt) {
 			if (!zombie->active || zombie->lane != projectile->lane) {
 				continue;
 			}
-			if (zombie->x + 0.35f < previous_x || zombie->x - 0.35f > projectile->x) {
+			if (!projectile_overlaps_zombie(previous_x, projectile->x, zombie)) {
 				continue;
 			}
 			if (zombie->x < best_x) {
