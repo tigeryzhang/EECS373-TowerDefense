@@ -882,12 +882,9 @@ static void draw_play_hud_dynamic(RenderView *view, const RenderData *data, cons
 static void draw_intro_board_static(RenderView *view) {
 	const int scale = 5;
 	const int title_y = (view->board_height - 5 * scale) / 2;
-	const IntRect panel = pvz_rect_make(4, 4, view->board_width - 8, view->board_height - 8);
 
-	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_BLACK);
-	draw_rect(view, RENDER_TARGET_BOARD, panel, RENDER_PALETTE_PANEL, 0);
-	draw_rect(view, RENDER_TARGET_BOARD, panel, RENDER_PALETTE_HIGHLIGHT, 2);
-	draw_text_3x5_centered(view, RENDER_TARGET_BOARD, "PVZ", view->board_width / 2, title_y, scale, RENDER_PALETTE_TEXT);
+	clear_target(view, RENDER_TARGET_BOARD, RENDER_PALETTE_TILE_DARK);
+	draw_text_3x5_centered(view, RENDER_TARGET_BOARD, "PvZ", view->board_width / 2, title_y, scale, RENDER_PALETTE_ART_5);
 }
 
 static void draw_intro_level_box(RenderView *view, uint8_t level_count, uint8_t level_index, bool selected) {

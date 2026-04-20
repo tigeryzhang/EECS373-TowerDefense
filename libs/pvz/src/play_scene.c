@@ -10,6 +10,7 @@ typedef enum {
 	PLAY_SCENE_SFX_CHOMP,
 	PLAY_SCENE_SFX_GULP,
 	PLAY_SCENE_SFX_BUCKET,
+	PLAY_SCENE_SFX_SUN,
 	PLAY_SCENE_SFX_PLANT,
 	PLAY_SCENE_SFX_SHOVEL,
 	PLAY_SCENE_SFX_FINALWAVE,
@@ -61,6 +62,7 @@ static uint8_t play_scene_sfx_priority(PlaySceneSfx sfx) {
 	switch (sfx) {
 	case PLAY_SCENE_SFX_FINALWAVE:
 		return 7;
+	case PLAY_SCENE_SFX_SUN:
 	case PLAY_SCENE_SFX_PLANT:
 	case PLAY_SCENE_SFX_SHOVEL:
 		return 6;
@@ -88,6 +90,8 @@ static const char *play_scene_sfx_filename(PlaySceneSfx sfx) {
 		return "gulp.wav";
 	case PLAY_SCENE_SFX_BUCKET:
 		return "bucket.wav";
+	case PLAY_SCENE_SFX_SUN:
+		return "sun.wav";
 	case PLAY_SCENE_SFX_PLANT:
 		return "plant.wav";
 	case PLAY_SCENE_SFX_SHOVEL:
@@ -254,6 +258,7 @@ static void play_scene_handle_command(Scene *scene, AppContext *app, InputComman
 																	});
 		if (result == GAME_COMMAND_RESULT_OK) {
 			play_scene_set_status(state, RENDER_STATUS_NONE, 0.0f);
+			play_scene_queue_sfx(audio, PLAY_SCENE_SFX_SUN);
 		}
 		break;
 	}
