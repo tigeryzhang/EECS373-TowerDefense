@@ -223,7 +223,7 @@ static void AUDIO_FillBuffer(uint16_t *buf, uint32_t len)
 
 
         // OR a slightly louder "Headroom" mix (e.g., 80% each)
-        int32_t mixed = (bgm >> 2) + (sfx >> 2);
+        int32_t mixed = (bgm >> 1) + (sfx >> 1);
 
         // Convert signed 16-bit → unsigned 12-bit for DAC
         buf[i] = (uint16_t)((mixed + 32768) >> 4);

@@ -923,12 +923,12 @@ static const char *result_message_for_status(GameStatus outcome) {
 }
 
 static int result_countdown_seconds_remaining(float return_timer_sec) {
-	int seconds = (int)ceilf(5.0f - return_timer_sec);
+	int seconds = (int)ceilf(15.0f - return_timer_sec);
 	if (seconds < 1) {
 		seconds = 1;
 	}
-	if (seconds > 5) {
-		seconds = 5;
+	if (seconds > 15) {
+		seconds = 15;
 	}
 	return seconds;
 }
@@ -938,7 +938,7 @@ static void format_result_countdown_text(char *buffer, size_t size, float return
 }
 
 static int result_countdown_text_x(const RenderView *view) {
-	return view->hud_width / 2 - text_width_3x5("RETURNING TO MENU IN 5S", 3) / 2;
+	return view->hud_width / 2 - text_width_3x5("RETURNING TO MENU IN 15S", 3) / 2;
 }
 
 static int result_countdown_text_y(const RenderView *view) { return (view->hud_height - 15) / 2; }
@@ -1167,8 +1167,8 @@ void presentation_prerender_result_view(RenderView *view) {
 
 void presentation_render_result_view(RenderView *view, GameStatus outcome, float previous_wipe_progress_01,
 									 float wipe_progress_01, float previous_return_timer_sec, float return_timer_sec) {
-	char previous_text[32];
-	char current_text[32];
+	char previous_text[35];
+	char current_text[35];
 	const int previous_width = result_wipe_width(view, previous_wipe_progress_01);
 	const int current_width = result_wipe_width(view, wipe_progress_01);
 

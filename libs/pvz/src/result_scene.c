@@ -5,7 +5,7 @@
 #include <string.h>
 
 static const float RESULT_WIPE_DURATION_SEC = 0.75f;
-static const float RESULT_RETURN_DELAY_SEC = 5.0f;
+static const float RESULT_RETURN_DELAY_SEC = 15.0f;
 
 static void result_scene_enter(Scene *scene, AppContext *app) {
 	ResultSceneState *state = (ResultSceneState *)scene->state;

@@ -267,7 +267,7 @@ static const PvzWaveDef level_2_waves[] = {
 static const PvzLevelDef builtin_levels[] = {
 	{.waves = level_0_waves, .wave_count = 3, .opening_delay_sec = 1.2f, .starting_sun_override = -1},
 	{.waves = level_1_waves, .wave_count = 5, .opening_delay_sec = 1.0f, .starting_sun_override = -1},
-	{.waves = level_2_waves, .wave_count = 4, .opening_delay_sec = 1.0f, .starting_sun_override = 225},
+	{.waves = level_2_waves, .wave_count = 4, .opening_delay_sec = 1.0f, .starting_sun_override = 200},
 };
 
 static uint8_t clamp_level_index(uint8_t level_index) {
