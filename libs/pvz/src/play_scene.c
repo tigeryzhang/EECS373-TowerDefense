@@ -305,6 +305,7 @@ static void play_scene_update(Scene *scene, AppContext *app, const InputFrame *i
 		app->result_state.outcome = state->game.status;
 		app->result_state.wipe_progress_01 = 0.0f;
 		app->result_state.previous_wipe_progress_01 = 0.0f;
+		app->result_state.return_timer_sec = 0.0f;
 		app->result_state.wipe_complete = false;
 		scene_request(scene, SCENE_ID_RESULT);
 		return;

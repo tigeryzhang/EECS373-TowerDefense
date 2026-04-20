@@ -26,6 +26,8 @@ typedef struct {
 	GameStatus outcome;
 	float wipe_progress_01;
 	float previous_wipe_progress_01;
+	float previous_return_timer_sec;
+	float return_timer_sec;
 	bool wipe_complete;
 } ResultSceneState;
 

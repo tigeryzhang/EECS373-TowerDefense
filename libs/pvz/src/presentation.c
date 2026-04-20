@@ -925,6 +925,27 @@ static const char *result_message_for_status(GameStatus outcome) {
 	return outcome == GAME_STATUS_WON ? "YOU WIN" : "YOU LOSE";
 }
 
+static int result_countdown_seconds_remaining(float return_timer_sec) {
+	int seconds = (int)ceilf(5.0f - return_timer_sec);
+	if (seconds < 1) {
+		seconds = 1;
+	}
+	if (seconds > 5) {
+		seconds = 5;
+	}
+	return seconds;
+}
+
+static void format_result_countdown_text(char *buffer, size_t size, float return_timer_sec) {
+	snprintf(buffer, size, "RETURNING TO MENU IN %dS", result_countdown_seconds_remaining(return_timer_sec));
+}
+
+static int result_countdown_text_x(const RenderView *view) {
+	return view->hud_width / 2 - text_width_3x5("RETURNING TO MENU IN 5S", 3) / 2;
+}
+
+static int result_countdown_text_y(const RenderView *view) { return (view->hud_height - 15) / 2; }
+
 static int result_wipe_width(const RenderView *view, float progress_01) {
 	int width = (int)lroundf(progress_01 * (float)view->board_width);
 	if (width < 0) {
@@ -1138,16 +1159,28 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 }
 
 void presentation_prerender_result_view(RenderView *view) {
+	char buffer[32];
+
 	clear_target(view, RENDER_TARGET_HUD, RENDER_PALETTE_PANEL);
-	draw_text_3x5_centered(view, RENDER_TARGET_HUD, "WAVE YOUR HAND OVER THE BOARD TO CONTINUE", view->hud_width / 2,
-						   (view->hud_height - 10) / 2, 2, RENDER_PALETTE_TEXT);
+	format_result_countdown_text(buffer, sizeof(buffer), 0.0f);
+	draw_text_3x5(view, RENDER_TARGET_HUD, buffer, result_countdown_text_x(view), result_countdown_text_y(view), 3,
+				  RENDER_PALETTE_TEXT);
 	mark_full_target_dirty(view, RENDER_TARGET_HUD);
 }
 
 void presentation_render_result_view(RenderView *view, GameStatus outcome, float previous_wipe_progress_01,
-									 float wipe_progress_01) {
+									 float wipe_progress_01, float previous_return_timer_sec, float return_timer_sec) {
+	char previous_text[32];
+	char current_text[32];
 	const int previous_width = result_wipe_width(view, previous_wipe_progress_01);
 	const int current_width = result_wipe_width(view, wipe_progress_01);
+
+	format_result_countdown_text(previous_text, sizeof(previous_text), previous_return_timer_sec);
+	format_result_countdown_text(current_text, sizeof(current_text), return_timer_sec);
+	if (strcmp(previous_text, current_text) != 0) {
+		update_text_element(view, previous_text, current_text, result_countdown_text_x(view), result_countdown_text_y(view),
+							3, RENDER_PALETTE_PANEL, RENDER_PALETTE_TEXT);
+	}
 
 	if (current_width <= previous_width) {
 		return;

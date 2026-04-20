@@ -128,4 +128,4 @@ void presentation_render_play_view(RenderView *view, RenderData *data, const Gam
 								   const PlayPresentationState *presentation_state);
 void presentation_prerender_result_view(RenderView *view);
 void presentation_render_result_view(RenderView *view, GameStatus outcome, float previous_wipe_progress_01,
-									 float wipe_progress_01);
+									 float wipe_progress_01, float previous_return_timer_sec, float return_timer_sec);

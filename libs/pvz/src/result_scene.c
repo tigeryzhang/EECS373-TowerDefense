@@ -5,12 +5,15 @@
 #include <string.h>
 
 static const float RESULT_WIPE_DURATION_SEC = 0.75f;
+static const float RESULT_RETURN_DELAY_SEC = 5.0f;
 
 static void result_scene_enter(Scene *scene, AppContext *app) {
 	ResultSceneState *state = (ResultSceneState *)scene->state;
 
 	state->wipe_progress_01 = 0.0f;
 	state->previous_wipe_progress_01 = 0.0f;
+	state->previous_return_timer_sec = 0.0f;
+	state->return_timer_sec = 0.0f;
 	state->wipe_complete = false;
 
 	if (app->result_state.outcome == GAME_STATUS_WON) {
@@ -26,10 +29,13 @@ static void result_scene_enter(Scene *scene, AppContext *app) {
 }
 
 static void result_scene_update(Scene *scene, AppContext *app, const InputFrame *input, float frame_dt) {
+	(void)input;
 	(void)app;
 
 	ResultSceneState *state = (ResultSceneState *)scene->state;
 	state->previous_wipe_progress_01 = state->wipe_progress_01;
+	state->previous_return_timer_sec = state->return_timer_sec;
+	state->return_timer_sec += frame_dt;
 
 	if (!state->wipe_complete) {
 		state->wipe_progress_01 += frame_dt / RESULT_WIPE_DURATION_SEC;
@@ -39,15 +45,8 @@ static void result_scene_update(Scene *scene, AppContext *app, const InputFrame 
 		}
 	}
 
-	if (!state->wipe_complete) {
-		return;
-	}
-
-	for (int index = 0; index < input->count; ++index) {
-		if (input->commands[index].type == INPUT_COMMAND_HAND_TRIGGER) {
-			scene_request(scene, SCENE_ID_INTRO);
-			return;
-		}
+	if (state->return_timer_sec >= RESULT_RETURN_DELAY_SEC) {
+		scene_request(scene, SCENE_ID_INTRO);
 	}
 }
 
@@ -63,7 +62,8 @@ static void result_scene_render(Scene *scene, AppContext *app, RenderView *view,
 	(void)data;
 
 	ResultSceneState *state = (ResultSceneState *)scene->state;
-	presentation_render_result_view(view, state->outcome, state->previous_wipe_progress_01, state->wipe_progress_01);
+	presentation_render_result_view(view, state->outcome, state->previous_wipe_progress_01, state->wipe_progress_01,
+									state->previous_return_timer_sec, state->return_timer_sec);
 }
 
 static void result_scene_exit(Scene *scene, AppContext *app) {
